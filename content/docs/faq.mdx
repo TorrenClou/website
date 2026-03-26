@@ -1,0 +1,53 @@
+---
+title: FAQ
+description: Frequently asked technical questions about TorrenCloud.
+---
+
+## Is my data private?
+
+Yes. TorrenCloud is fully self-hosted. Your torrent files, download data, and cloud credentials are stored exclusively inside your Docker container's volumes. No data is transmitted to any third-party service.
+
+## Which cloud providers are supported?
+
+**Google Drive** via OAuth 2.0 and any **S3-compatible storage** — including AWS S3, Backblaze B2, MinIO, Wasabi, Cloudflare R2, and DigitalOcean Spaces.
+
+## What are the hardware requirements?
+
+- **RAM**: 2 GB minimum, 4 GB recommended
+- **Disk**: 3 GB for the Docker image + space for downloads
+- **CPU**: Any modern 64-bit processor
+- **OS**: Anything that runs Docker (Linux, macOS, Windows with WSL2)
+
+## How do I update to a new version?
+
+```bash
+docker pull ghcr.io/torrenclou/torrentclou:latest
+docker stop torrencloud && docker rm torrencloud
+./run.sh
+```
+
+Your data persists in Docker volumes and survives container re-creation.
+
+## Can multiple users share one instance?
+
+The current version is designed for single-admin use. Multi-user support with per-user storage configs and job isolation is planned for a future release.
+
+## What happens if a download fails?
+
+Failed jobs can be retried from the dashboard. The job queue (Hangfire + Redis) survives container restarts and tracks full retry history.
+
+## Can I access TorrenCloud remotely?
+
+Yes. Expose ports 47100 and 47200, set `NEXTAUTH_URL` to your public URL, and access from any browser. For production, place a reverse proxy (nginx, Caddy) in front and terminate TLS there.
+
+## Where are downloaded files stored?
+
+Inside the container at `/data/downloads`, mapped to the `torrencloud-downloads` Docker volume. You can mount a local directory instead:
+
+```bash
+docker run ... -v /path/to/local/dir:/data/downloads ...
+```
+
+## Is there a hosted version?
+
+No. TorrenCloud is 100% self-hosted by design. There is no cloud service, no accounts, no subscriptions. You own everything.

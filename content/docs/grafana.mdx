@@ -1,0 +1,98 @@
+---
+title: Grafana Monitoring
+description: Monitor your TorrenCloud instance with built-in Grafana dashboards.
+---
+
+## Overview
+
+Grafana, Prometheus, and Loki are **bundled inside the TorrenCloud Docker container** — no extra setup needed. After installation, monitoring is available immediately:
+
+| Service | URL | Credentials |
+|---|---|---|
+| Grafana | `http://localhost:47500` | `admin` / `admin` |
+| Prometheus | `http://localhost:47600` | — |
+
+Prometheus metrics and tracing are enabled by default when using the one-command installer.
+
+## Prometheus Metrics
+
+TorrenCloud exposes a `/metrics` endpoint on the API port:
+
+```
+http://localhost:47200/metrics
+```
+
+### Add Prometheus Data Source in Grafana
+
+1. Open Grafana at `http://localhost:47500` and log in (`admin` / `admin`)
+2. Go to **Configuration** → **Data Sources** → **Add data source**
+3. Select **Prometheus**
+4. Set the URL to `http://localhost:47600`
+5. Click **Save & Test**
+
+### Key Metrics
+
+| Metric | Description |
+|---|---|
+| `torrencloud_downloads_total` | Total downloads processed |
+| `torrencloud_downloads_active` | Currently active downloads |
+| `torrencloud_uploads_total` | Total cloud uploads completed |
+| `torrencloud_job_queue_depth` | Pending jobs in the queue |
+| `torrencloud_job_duration_seconds` | Job processing duration histogram |
+
+## Loki Logs
+
+With `OBSERVABILITY_LOKI_URL` configured in your `.env`, TorrenCloud pushes structured logs to the built-in Loki instance.
+
+### Add Loki Data Source in Grafana
+
+1. Go to **Configuration** → **Data Sources** → **Add data source**
+2. Select **Loki**
+3. Set the URL to `http://localhost:47700`
+4. Click **Save & Test**
+
+### Useful Log Queries
+
+Filter download events:
+
+```
+{app="torrencloud"} |= "download"
+```
+
+Filter errors:
+
+```
+{app="torrencloud"} | logfmt | level = "error"
+```
+
+## OpenTelemetry Traces
+
+With `OBSERVABILITY_ENABLE_TRACING=true` (enabled by default), TorrenCloud exports distributed traces.
+
+Traces cover the full lifecycle: torrent download → file processing → cloud upload.
+
+## Build a Dashboard
+
+Create a new dashboard in Grafana and add panels for:
+
+- **Active Downloads** — gauge using `torrencloud_downloads_active`
+- **Download Throughput** — graph using `rate(torrencloud_downloads_total[5m])`
+- **Upload Success Rate** — stat using `torrencloud_uploads_total`
+- **Queue Depth** — graph using `torrencloud_job_queue_depth`
+- **Error Logs** — logs panel using Loki `{app="torrencloud"} | logfmt | level = "error"`
+- **Job Duration** — heatmap using `torrencloud_job_duration_seconds`
+
+## Enable Additional Observability
+
+To connect to external observability backends, add these to your `.env`:
+
+```ini
+OBSERVABILITY_LOKI_URL=http://localhost:47700
+OBSERVABILITY_OTLP_ENDPOINT=http://localhost:47800
+```
+
+Restart the container after updating `.env`:
+
+```bash
+docker restart torrencloud
+```

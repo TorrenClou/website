@@ -1,0 +1,150 @@
+---
+title: Getting Started
+description: Install and run TorrenCloud in under 5 minutes with Docker.
+---
+
+## One-Command Install
+
+**Linux / macOS:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash
+```
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://raw.githubusercontent.com/TorrenClou/deploy/main/install.ps1 | iex
+```
+
+The installer handles everything: clones the repo, generates secrets, creates `.env`, pulls the Docker image, and starts TorrenCloud with Grafana monitoring.
+
+**On a remote server**, the installer auto-detects your server's IP and prints accessible URLs using [sslip.io](https://sslip.io) — no DNS setup needed:
+
+```
+Frontend   http://192-168-1-100.sslip.io:47100
+API        http://192-168-1-100.sslip.io:47200/api
+Grafana    http://192-168-1-100.sslip.io:47500
+```
+
+It also prints the exact **Google Drive redirect URI** to register in Google Cloud Console.
+
+### Default Credentials
+
+| Service | URL | User | Password |
+|---|---|---|---|
+| TorrenCloud | `http://localhost:47100` | `admin@torrencloud.local` | `TorrenCloud@2024` |
+| Hangfire | `http://localhost:47200/hangfire` | _(same as above)_ | _(same as above)_ |
+| Grafana | `http://localhost:47500` | `admin` | `admin` |
+| Prometheus | `http://localhost:47600` | — | — |
+
+> **Important:** Change default credentials in `./torrencloud/.env` and run `docker restart torrencloud`.
+
+---
+
+## Manual Setup
+
+If you prefer full control, follow the steps below.
+
+### Prerequisites
+
+- **Docker** 20.10 or later — [Install Docker](https://docs.docker.com/get-docker/)
+- **2 GB free RAM** minimum
+- **3 GB free disk space** for the Docker image
+
+### 1. Clone the deploy repository
+
+```bash
+git clone https://github.com/TorrenClou/deploy.git
+cd deploy
+```
+
+### 2. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` and fill in the required values:
+
+| Variable | Required | Description |
+|---|---|---|
+| `POSTGRES_PASSWORD` | Yes | Any strong password |
+| `JWT_SECRET` | Yes | Random string, minimum 32 characters |
+| `NEXTAUTH_SECRET` | Yes | A different random string |
+| `ADMIN_EMAIL` | Yes | Your login email |
+| `ADMIN_PASSWORD` | Yes | Your login password |
+
+Generate secrets with:
+
+```bash
+# Linux / macOS
+openssl rand -base64 32
+```
+
+```powershell
+# PowerShell
+[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Max 256 }) -as [byte[]])
+```
+
+### 3. Run
+
+**Linux / macOS:**
+
+```bash
+chmod +x run.sh && ./run.sh
+```
+
+**Windows (PowerShell):**
+
+```powershell
+.\run.ps1
+```
+
+**Or directly with Docker:**
+
+```bash
+docker run -d --name torrencloud \
+  -p 47100:47100 -p 47200:47200 -p 47500:47500 -p 47600:47600 \
+  -v torrencloud-pgdata:/data/postgres \
+  -v torrencloud-redis:/data/redis \
+  -v torrencloud-downloads:/data/downloads \
+  --env-file .env \
+  ghcr.io/torrenclou/torrentclou:latest
+```
+
+### 4. Open
+
+Wait ~30 seconds for all services to start:
+
+| Service | URL |
+|---|---|
+| Frontend | `http://localhost:47100` |
+| API | `http://localhost:47200/api` |
+| API Health | `http://localhost:47200/api/health/ready` |
+| Hangfire Dashboard | `http://localhost:47200/hangfire` |
+| Grafana | `http://localhost:47500` |
+| Prometheus | `http://localhost:47600` |
+
+Log in with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` you set in `.env`.
+
+## Verify
+
+```bash
+curl http://localhost:47200/api/health/ready
+# Should return { "status": "Healthy" }
+```
+
+## Troubleshooting
+
+**"Connection refused" on port 47200** — The API takes 15-20 seconds to start on first boot (runs database migrations). Wait and retry.
+
+**"CHANGE_ME" errors** — Ensure all required values in `.env` are filled in.
+
+**Port conflicts** — Change the port mapping: `-p 47101:47100` and update `NEXTAUTH_URL=http://localhost:47101` in `.env`.
+
+Check logs for more details:
+
+```bash
+docker logs -f torrencloud
+```

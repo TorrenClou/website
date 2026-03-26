@@ -1,0 +1,14 @@
+{
+  "title": "TorrenCloud",
+  "pages": [
+    "index",
+    "getting-started",
+    "usage",
+    "---Providers---",
+    "providers",
+    "---Monitoring---",
+    "grafana",
+    "configuration",
+    "faq"
+  ]
+}

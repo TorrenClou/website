@@ -1,0 +1,4 @@
+{
+  "title": "Providers",
+  "pages": ["google-drive", "s3", "s3-compatible"]
+}

@@ -1,0 +1,44 @@
+---
+title: Overview
+description: TorrenCloud is a self-hosted, Docker-based torrent-to-cloud sync system.
+---
+
+## What is TorrenCloud?
+
+TorrenCloud is a self-hosted platform that downloads torrents and automatically syncs completed files to your cloud storage. The entire stack — frontend, API, background workers, database, and cache — ships as a **single Docker container**.
+
+## Key Features
+
+- Upload `.torrent` files from a clean web UI
+- Auto-sync completed downloads to **Google Drive** or **S3-compatible storage**
+- Real-time download progress monitoring and job dashboard
+- Background job queue that survives container restarts
+- One Docker container, one command to deploy
+
+## Architecture
+
+TorrenCloud uses a clean architecture pattern with separate layers for API, business logic, infrastructure, and background workers.
+
+| Component | Technology |
+|-----------|-----------|
+| Frontend | Next.js 15, TypeScript, Tailwind CSS |
+| Backend API | .NET 9.0 (Clean Architecture) |
+| Torrent Worker | Hangfire background job processor |
+| Google Drive Worker | OAuth 2.0 sync processor |
+| S3 Worker | S3-compatible upload processor |
+| Database | PostgreSQL 15 |
+| Cache & Jobs | Redis 7 |
+| Process Manager | supervisord |
+
+## Data Flow
+
+1. You upload a `.torrent` file
+2. The API creates a background job in the queue
+3. The Torrent Worker downloads the file
+4. On completion, a cloud sync job is enqueued
+5. The Google Drive or S3 Worker uploads the file to your storage
+6. Status updates are visible in real-time on the dashboard
+
+## Next Steps
+
+Get started with the [installation guide](/docs/getting-started).

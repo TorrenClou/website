@@ -1,0 +1,83 @@
+---
+title: Usage Guide
+description: How to add torrents, manage jobs, and use cloud storage integrations.
+---
+
+## Adding Torrents
+
+### Upload a .torrent file
+
+1. Navigate to the **Torrents** page from the sidebar
+2. Click **Upload .torrent**
+3. Select your `.torrent` file — the download job starts immediately
+
+## Monitoring Downloads
+
+The **Dashboard** shows:
+
+- Active jobs with real-time progress bars
+- Download speed and estimated time remaining
+- Upload progress percentage for cloud sync jobs
+- Job status progression: **Queued** → **Downloading** → **Pending Upload** → **Uploading** → **Completed**
+
+## Managing Jobs
+
+Jobs can be **retried** or **cancelled** from the job detail view. The job queue is powered by Hangfire with Redis as the backing store — it survives container restarts.
+
+Visit the **Hangfire Dashboard** at `http://localhost:47200/hangfire` to see raw queue state, active workers, and retry history.
+
+## Configuring Cloud Storage
+
+Cloud storage is managed under **Storage** in the sidebar:
+
+- [Google Drive Setup](/docs/providers/google-drive)
+- [AWS S3 Setup](/docs/providers/s3)
+- [S3-Compatible (Backblaze B2, MinIO)](/docs/providers/s3-compatible)
+
+## Common Operations
+
+### View logs
+
+```bash
+docker logs -f torrencloud
+```
+
+### Stop the application
+
+```bash
+docker stop torrencloud
+```
+
+### Start again (data persists)
+
+```bash
+docker start torrencloud
+```
+
+### Access downloaded files
+
+```bash
+docker exec -it torrencloud ls /data/downloads
+```
+
+Or mount a local directory instead of a Docker volume:
+
+```bash
+docker run -d --name torrencloud \
+  -p 47100:47100 -p 47200:47200 \
+  -v torrencloud-pgdata:/data/postgres \
+  -v torrencloud-redis:/data/redis \
+  -v /path/to/your/downloads:/data/downloads \
+  --env-file .env \
+  ghcr.io/torrenclou/torrentclou:latest
+```
+
+## Updating
+
+```bash
+docker pull ghcr.io/torrenclou/torrentclou:latest
+docker stop torrencloud && docker rm torrencloud
+./run.sh
+```
+
+Data persists in Docker volumes across container re-creations.

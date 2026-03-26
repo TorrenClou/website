@@ -1,0 +1,73 @@
+---
+title: Configuration Reference
+description: Full reference for all TorrenCloud environment variables.
+---
+
+All configuration is done through environment variables in your `.env` file.
+
+## Required Variables
+
+| Variable | Description |
+|---|---|
+| `POSTGRES_PASSWORD` | PostgreSQL password (used internally) |
+| `JWT_SECRET` | JWT signing key, minimum 32 characters |
+| `NEXTAUTH_SECRET` | NextAuth.js secret, must differ from JWT_SECRET |
+| `ADMIN_EMAIL` | Admin login email |
+| `ADMIN_PASSWORD` | Admin login password |
+
+## Optional Variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `ADMIN_NAME` | `Admin` | Admin display name |
+| `NEXTAUTH_URL` | `http://localhost:47100` | Public frontend URL (set automatically by installer on remote servers) |
+| `PUBLIC_FRONTEND_URL` | — | Override for sslip.io / custom public URL |
+| `BACKEND_URL` | `http://127.0.0.1:47200` | Backend URL for server-side auth requests |
+| `GOOGLE_CLIENT_ID` | — | Google OAuth client ID (required only for Google Drive) |
+| `POSTGRES_DB` | `torrenclo` | Database name |
+| `POSTGRES_USER` | `torrenclo_user` | Database username |
+| `JWT_ISSUER` | `TorrenClou_API` | JWT issuer claim |
+| `JWT_AUDIENCE` | `TorrenClou_Client` | JWT audience claim |
+| `HANGFIRE_WORKER_COUNT` | `10` | Background job concurrency |
+
+## Observability (Optional)
+
+| Variable | Description |
+|---|---|
+| `OBSERVABILITY_LOKI_URL` | Loki log aggregation endpoint |
+| `OBSERVABILITY_OTLP_ENDPOINT` | OpenTelemetry trace exporter endpoint |
+| `OBSERVABILITY_ENABLE_PROMETHEUS` | Expose `/metrics` endpoint (`true`/`false`) |
+| `OBSERVABILITY_ENABLE_TRACING` | Enable distributed tracing (`true`/`false`) |
+
+## Data Persistence
+
+Data is stored in Docker volumes:
+
+| Volume | Container Path | Purpose |
+|---|---|---|
+| `torrencloud-pgdata` | `/data/postgres` | PostgreSQL database |
+| `torrencloud-redis` | `/data/redis` | Redis data |
+| `torrencloud-downloads` | `/data/downloads` | Downloaded torrent files |
+
+## Custom Domain Setup
+
+If deploying on a server with a domain name, set these in `.env`:
+
+```ini
+NEXTAUTH_URL=https://your-domain.com:47100
+PUBLIC_FRONTEND_URL=https://your-domain.com:47100
+```
+
+The frontend automatically discovers the backend API at runtime using the browser's current origin — no rebuild needed. Google Drive OAuth will use `https://your-domain.com:47100/proxy/api/storage/gdrive/callback` as the redirect URI.
+
+## Generating Secrets
+
+```bash
+# Linux / macOS
+openssl rand -base64 32
+```
+
+```powershell
+# PowerShell
+[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Max 256 }) -as [byte[]])
+```

@@ -1,0 +1,51 @@
+---
+title: AWS S3
+description: Sync completed downloads to Amazon S3 using IAM credentials.
+---
+
+## Prerequisites
+
+An AWS account with an S3 bucket created.
+
+## Step 1: Create IAM Credentials
+
+Create an IAM user with a policy granting access to your bucket:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject", "s3:ListBucket"],
+      "Resource": [
+        "arn:aws:s3:::your-bucket-name",
+        "arn:aws:s3:::your-bucket-name/*"
+      ]
+    }
+  ]
+}
+```
+
+## Step 2: Configure in TorrenCloud
+
+1. Go to **Storage** → **S3**
+2. Fill in the connection details:
+   - **Endpoint**: `https://s3.amazonaws.com` (or your region endpoint)
+   - **Access Key ID**: from IAM
+   - **Secret Access Key**: from IAM
+   - **Bucket Name**: your S3 bucket
+   - **Region**: e.g. `us-east-1`
+3. Click **Test Connection** to verify, then **Save**
+
+## Step 3: Configure Auto-Sync
+
+Toggle **Auto-sync** to automatically upload completed downloads to this bucket.
+
+## Large Files
+
+TorrenCloud uses **resumable multipart uploads** for large files. If an upload is interrupted (e.g., container restart), it will resume from where it left off.
+
+## Security Notes
+
+Credentials are stored encrypted in your container's PostgreSQL database. They never leave your server — uploads go directly from your machine to AWS.
