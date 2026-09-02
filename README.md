@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TorrenClou Website
 
-## Getting Started
+The marketing site and — more importantly — **the canonical documentation** for
+[TorrenClou](https://tc.gitnasr.com), self-hosted torrent-to-cloud.
 
-First, run the development server:
+Live at **[tc.gitnasr.com](https://tc.gitnasr.com)**.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Docs live here, and only here
+
+Every fact about installing, configuring or operating TorrenClou belongs in
+`content/docs/`. The READMEs in
+[backend](https://github.com/TorrenClou/backend),
+[frontend](https://github.com/TorrenClou/frontend) and
+[deploy](https://github.com/TorrenClou/deploy) link here rather than restating
+anything, because for a long time they each kept their own copy and the copies
+disagreed with each other and with the code.
+
+If you are about to write a configuration table, a port list or an install
+walkthrough into another repo's README: write it here instead and link to it.
+
+## Layout
+
+```
+content/docs/          The documentation. MDX, one file per page.
+  meta.json            Sidebar order and section labels.
+src/app/               Landing page, docs routes, sitemap, robots, OG images.
+src/components/        Landing sections and shared UI.
+snippets/              Short strings that must appear verbatim in other repos'
+                       READMEs — the install commands, the image name.
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Built with [Fumadocs](https://fumadocs.dev) on Next.js. Pages are statically
+generated from `content/docs`; `src/lib/source.ts` is the loader.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Developing
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+git clone https://github.com/TorrenClou/website.git
+cd website
+npm install
+npm run dev
+```
 
-## Learn More
+Open `http://localhost:3000`.
 
-To learn more about Next.js, take a look at the following resources:
+### Adding a documentation page
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Create `content/docs/<name>.mdx` with `title` and `description` frontmatter.
+2. Add its slug to `content/docs/meta.json` where you want it in the sidebar.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+That is the whole process — the route, the sidebar entry, the sitemap entry and
+the OG image all follow from those two steps.
 
-## Deploy on Vercel
+## Repositories
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Repository | Contents |
+|------------|----------|
+| [backend](https://github.com/TorrenClou/backend) | .NET 9 API and workers |
+| [frontend](https://github.com/TorrenClou/frontend) | Next.js web app |
+| [deploy](https://github.com/TorrenClou/deploy) | All-in-one image, installer, CI |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+MIT — see [LICENSE](https://github.com/TorrenClou/website/blob/main/LICENSE).
