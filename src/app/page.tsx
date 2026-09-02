@@ -8,25 +8,25 @@ import { PricingSection } from "@/components/landing/PricingSection";
 import { FaqSection } from "@/components/landing/FaqSection";
 
 export const metadata: Metadata = {
-  title: "TorrenCloud — You're One Command Away from Having Your Torrent to Your Cloud",
+  title: "TorrenClou — You're One Command Away from Having Your Torrent to Your Cloud",
   description:
     "No Questions Asked. No Traces. Self-hosted torrent-to-cloud sync with Google Drive and S3.",
   alternates: {
     canonical: "https://tc.gitnasr.com",
   },
   openGraph: {
-    title: "TorrenCloud",
+    title: "TorrenClou",
     description:
       "Self-hosted torrent-to-cloud sync in one Docker container.",
     url: "https://tc.gitnasr.com",
-    images: [{ url: "/api/og?type=landing", width: 1200, height: 630, alt: "TorrenCloud" }],
+    images: [{ url: "/api/og?type=landing", width: 1200, height: 630, alt: "TorrenClou" }],
   },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "TorrenCloud",
+  name: "TorrenClou",
   operatingSystem: "Docker (Linux, macOS, Windows)",
   applicationCategory: "UtilitiesApplication",
   offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },

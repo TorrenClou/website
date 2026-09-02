@@ -1,6 +1,6 @@
 ---
 title: Google Drive
-description: Connect TorrenCloud to your Google Drive using OAuth 2.0.
+description: Connect TorrenClou to your Google Drive using OAuth 2.0.
 ---
 
 ## Prerequisites
@@ -19,13 +19,13 @@ A Google Cloud project with the Google Drive API enabled.
 
 ## Step 2: Connect Your Account
 
-1. In TorrenCloud, go to **Storage** → **Google Drive**
+1. In TorrenClou, go to **Storage** → **Google Drive**
 2. Enter the **Client ID** and **Client Secret** from the previous step
 3. Click **Connect Google Account**
 4. Complete the OAuth flow in your browser
 5. Select which Drive folder to sync to
 
-Google credentials are saved securely within TorrenCloud during configuration — no environment variables needed.
+Google credentials are saved securely within TorrenClou during configuration — no environment variables needed.
 
 ## Step 3: Configure Auto-Sync
 
@@ -38,10 +38,10 @@ After connecting, set up sync rules:
 
 - OAuth tokens are stored encrypted in the PostgreSQL database inside your container
 - Files are uploaded directly from your server to Google Drive — no intermediary
-- To revoke access: visit [myaccount.google.com/permissions](https://myaccount.google.com/permissions) and remove TorrenCloud
+- To revoke access: visit [myaccount.google.com/permissions](https://myaccount.google.com/permissions) and remove TorrenClou
 
 ## Troubleshooting
 
-**"Redirect URI mismatch"** — The redirect URI must exactly match what TorrenCloud shows in the storage settings form. It follows the pattern `http://<your-host>:47100/proxy/api/storage/gdrive/callback`. If you installed via the one-command installer, the exact URI was printed at the end of installation.
+**"Redirect URI mismatch"** — The redirect URI must exactly match what TorrenClou shows in the storage settings form. It follows the pattern `http://<your-host>:47100/proxy/api/storage/gdrive/callback`. If you installed via the one-command installer, the exact URI was printed at the end of installation.
 
 **"Access denied"** — Make sure the Google Drive API is enabled in your Cloud Console project.

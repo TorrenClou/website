@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Type check and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      # The docs sidebar is driven by meta.json, which lists page slugs by hand.
+      # A typo there silently drops the page from the nav without failing the
+      # build, so check every listed slug resolves to a file and every file is
+      # listed.
+      - name: Check meta.json matches content/docs
+        run: |
+          set -euo pipefail
+          fail=0
+          for dir in $(find content/docs -name meta.json -exec dirname {} \;); do
+            listed=$(node -e "
+              const m = require('./$dir/meta.json');
+              console.log((m.pages || [])
+                .filter(p => !p.startsWith('---'))
+                .join('\n'));
+            ")
+            for slug in $listed; do
+              if [ ! -e "$dir/$slug.mdx" ] && [ ! -d "$dir/$slug" ]; then
+                echo "::error file=$dir/meta.json::'$slug' is listed but $dir/$slug.mdx does not exist"
+                fail=1
+              fi
+            done
+            for f in "$dir"/*.mdx; do
+              [ -e "$f" ] || continue
+              slug=$(basename "$f" .mdx)
+              if ! echo "$listed" | grep -qx "$slug"; then
+                echo "::error file=$f::'$slug' exists but is not listed in $dir/meta.json, so it is missing from the sidebar"
+                fail=1
+              fi
+            done
+          done
+          exit $fail
+
+      # Relative links break wherever a Markdown file is rendered outside its
+      # own directory. This repo's README is read on GitHub and scraped
+      # elsewhere; the org profile shipped 404s for exactly this reason.
+      - name: Ban relative links in Markdown
+        run: |
+          set -euo pipefail
+          if grep -rnE '\]\((\./|\.\./|docs/|wiki/)' --include='*.md' . \
+               --exclude-dir=node_modules --exclude-dir=.next --exclude-dir=.wiki-import; then
+            echo "::error::Relative Markdown links found. Use absolute https:// URLs."
+            exit 1
+          fi
+          echo "No relative links."

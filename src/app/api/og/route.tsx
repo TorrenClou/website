@@ -19,7 +19,7 @@ async function loadFont(
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
-  const title = searchParams.get("title") ?? "TorrenCloud";
+  const title = searchParams.get("title") ?? "TorrenClou";
   const description =
     searchParams.get("description") ??
     "You're One Command Away from Having Your Torrent to Your Cloud";
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
             ☁
           </div>
           <span style={{ fontSize: 24, fontWeight: 700, color: "#ffffff" }}>
-            TorrenCloud
+            TorrenClou
           </span>
           {type === "docs" && (
             <span

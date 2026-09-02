@@ -10,7 +10,7 @@ const FAQ_ITEMS: FaqItem[] = [
   {
     question: "Is my data private?",
     answer:
-      "Yes. TorrenCloud is 100% self-hosted. Your torrent files, downloads, and cloud credentials are stored exclusively inside your Docker container. No data is ever sent to any external service.",
+      "Yes. TorrenClou is 100% self-hosted. Your torrent files, downloads, and cloud credentials are stored exclusively inside your Docker container. No data is ever sent to any external service.",
   },
   {
     question: "Which cloud providers are supported?",
@@ -38,14 +38,14 @@ const FAQ_ITEMS: FaqItem[] = [
       "Failed jobs can be retried from the dashboard. The job queue is powered by Hangfire and Redis — it survives container restarts and tracks retry history.",
   },
   {
-    question: "Can I access TorrenCloud remotely?",
+    question: "Can I access TorrenClou remotely?",
     answer:
       "Yes. Expose ports 47100 and 47200, set NEXTAUTH_URL to your public URL, and access from any browser. For production, use a reverse proxy like nginx or Caddy with TLS.",
   },
   {
     question: "Is there a hosted version?",
     answer:
-      "No. TorrenCloud is self-hosted by design. There is no cloud service, no accounts, no subscriptions. You own everything.",
+      "No. TorrenClou is self-hosted by design. There is no cloud service, no accounts, no subscriptions. You own everything.",
   },
 ];
 

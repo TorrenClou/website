@@ -1,5 +1,5 @@
 {
-  "title": "TorrenCloud",
+  "title": "TorrenClou",
   "pages": [
     "index",
     "getting-started",
@@ -8,6 +8,7 @@
     "providers",
     "---Monitoring---",
     "grafana",
+    "---Reference---",
     "configuration",
     "faq"
   ]

@@ -11,8 +11,8 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL("https://tc.gitnasr.com"),
   title: {
-    default: "TorrenCloud — Torrent to Cloud, One Command Away",
-    template: "%s — TorrenCloud",
+    default: "TorrenClou — Torrent to Cloud, One Command Away",
+    template: "%s — TorrenClou",
   },
   description:
     "Self-hosted torrent-to-cloud sync. Download torrents and auto-sync to Google Drive or S3. One Docker container, one command.",
@@ -30,10 +30,10 @@ export const metadata: Metadata = {
   creator: "TorrenClou",
   openGraph: {
     type: "website",
-    siteName: "TorrenCloud",
+    siteName: "TorrenClou",
     locale: "en_US",
     url: "https://tc.gitnasr.com",
-    images: [{ url: "/api/og", width: 1200, height: 630, alt: "TorrenCloud — Torrent to Cloud, One Command Away" }],
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: "TorrenClou — Torrent to Cloud, One Command Away" }],
   },
   twitter: {
     card: "summary_large_image",
