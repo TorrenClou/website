@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/TorrenClou/website/compare/v0.1.1...v0.1.2) (2026-09-03)
+
+
+### Documentation
+
+* add PaaS deployment guides ([#8](https://github.com/TorrenClou/website/issues/8)) ([ce2fba8](https://github.com/TorrenClou/website/commit/ce2fba895142aa4a99ed5770badfdf82712b590e))
+
 ## [0.1.1](https://github.com/TorrenClou/website/compare/v0.1.0...v0.1.1) (2026-09-03)
 
 
