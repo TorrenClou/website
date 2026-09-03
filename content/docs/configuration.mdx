@@ -50,79 +50,36 @@ Shows what the downloads volume holds, split three ways:
 
 ## Environment variables
 
-All optional. Setting one overrides the built-in behaviour for that value only.
+**None of these are required.** A `docker run` with no `-e` flags and no `--env-file` is a
+complete configuration — the container generates what it needs on first boot.
 
-### Public address
+This table is generated from the backend's own option declarations and attached to each release,
+so it describes what the code implements rather than what someone remembered to write down. It
+used to be maintained by hand here, in two READMEs, in `deploy/docs` and in `.env.example`, and no
+two copies agreed.
 
-| Variable | Default | When you need it |
-|----------|---------|------------------|
-| `PUBLIC_FRONTEND_URL` | derived from the request | A proxy that does not send `X-Forwarded-Host` |
-| `NEXTAUTH_URL` | derived from the request | Same |
-| `FRONTEND_URL` | falls back to `PUBLIC_FRONTEND_URL` | Overrides just the OAuth return address |
+<ConfigSchemaVersion />
 
-Normally the app works out its own address from the incoming request, which is why it works on
-any host or IP with no configuration.
+### Required by the application
 
-### Database
+These have no built-in default. The all-in-one image generates both on first boot and keeps them
+on the `torrencloud-pgdata` volume, which is why you never set them by hand — but a split
+deployment, where nothing generates them, must supply them.
 
-| Variable | Default |
-|----------|---------|
-| `POSTGRES_DB` | `torrenclo` |
-| `POSTGRES_USER` | `torrenclo_user` |
-| `POSTGRES_PASSWORD` | generated on first run |
+<ConfigTable filter="required" />
 
-### Secrets
+### Optional overrides
 
-| Variable | Default |
-|----------|---------|
-| `JWT_SECRET` | generated on first run |
-| `NEXTAUTH_SECRET` | generated on first run |
-| `GRAFANA_ADMIN_USER` | `admin` |
-| `GRAFANA_ADMIN_PASSWORD` | generated on first run |
+Setting one overrides the built-in behaviour for that value only.
 
-Generated values live in `/data/postgres/secrets.env` on the `torrencloud-pgdata` volume:
+<ConfigTable filter="optional" />
 
-```bash
-docker exec torrencloud cat /data/postgres/secrets.env
-```
+### Legacy
 
-Set `JWT_SECRET` and `NEXTAUTH_SECRET` explicitly if you want sessions to survive a rebuilt data
-volume.
+Only for installs that predate the first-run wizard.
 
-### Observability
+<ConfigTable filter="deprecated" />
 
-| Variable | Default |
-|----------|---------|
-| `OBSERVABILITY_LOKI_URL` | unset |
-| `OBSERVABILITY_LOKI_USERNAME` | unset |
-| `OBSERVABILITY_LOKI_API_KEY` | unset |
-| `OBSERVABILITY_OTLP_ENDPOINT` | unset |
-| `OBSERVABILITY_OTLP_HEADERS` | unset |
-
-For shipping logs and traces off-box. The bundled [Grafana and Prometheus](/docs/grafana) work
-without any of this.
-
-### Legacy admin
-
-| Variable | Default |
-|----------|---------|
-| `ADMIN_EMAIL` | unset |
-| `ADMIN_PASSWORD` | unset |
-| `ADMIN_NAME` | unset |
-
-Only for installs that predate the setup wizard. **Setting these disables the wizard**, because
-an instance whose owner already has a way in must not offer itself to whoever arrives first. See
-[First-run setup](/docs/first-run#upgrading-an-older-install).
-
-### Other
-
-| Variable | Default | Notes |
-|----------|---------|-------|
-| `HANGFIRE_WORKER_COUNT` | 10 | Overridden by the Settings value once you save one |
-| `APPLY_MIGRATIONS` | `true` | Run database migrations on start |
-| `ALLOW_SCHEMA_AHEAD` | `false` | Start even when the database has migrations this build does not know about. See [Updating](/docs/updating#rolling-back) |
-| `BACKEND_URL` | `http://127.0.0.1:47200` | Where the frontend finds the API |
-| `JWT_ISSUER` / `JWT_AUDIENCE` | `TorrenClou_API` / `TorrenClou_Client` | No reason to change these |
 
 ## Precedence
 
