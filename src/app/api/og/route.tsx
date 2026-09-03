@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
 import type { OgImageType } from "@/types";
+import { siteConfig } from "@/lib/site";
 
 export const runtime = "edge";
 
@@ -9,7 +10,7 @@ async function loadFont(
   weight: 400 | 700 | 800
 ): Promise<ArrayBuffer> {
   // Fonts are in /public/fonts/ — fetch via the same origin so it works in
-  // both dev (localhost) and production (tc.gitnasr.com)
+  // both dev (localhost) and production
   const { origin } = new URL(request.url);
   return fetch(`${origin}/fonts/inter-${weight}.woff`).then((r) =>
     r.arrayBuffer()
@@ -177,7 +178,7 @@ export async function GET(request: NextRequest) {
             </span>
           </div>
           <span style={{ fontSize: 14, color: "#484f58", fontWeight: 400 }}>
-            tc.gitnasr.com
+            {siteConfig.url.replace("https://", "")}
           </span>
         </div>
       </div>

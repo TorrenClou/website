@@ -42,7 +42,7 @@ http://localhost:47200/metrics
 
 ## Loki Logs
 
-With `OBSERVABILITY_LOKI_URL` configured in your `.env`, TorrenClou pushes structured logs to the built-in Loki instance.
+With `OBSERVABILITY_LOKI_URL` set, TorrenClou pushes structured logs to the built-in Loki instance. It is unset by default, and the bundled Grafana and Prometheus work without it.
 
 ### Add Loki Data Source in Grafana
 
@@ -84,14 +84,14 @@ Create a new dashboard in Grafana and add panels for:
 
 ## Enable Additional Observability
 
-To connect to external observability backends, add these to your `.env`:
+To ship logs and traces to an external backend, pass these as environment variables:
 
 ```ini
 OBSERVABILITY_LOKI_URL=http://localhost:47700
 OBSERVABILITY_OTLP_ENDPOINT=http://localhost:47800
 ```
 
-Restart the container after updating `.env`:
+These are read at start, so restart the container after changing them:
 
 ```bash
 docker restart torrencloud

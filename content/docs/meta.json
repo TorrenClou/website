@@ -2,14 +2,21 @@
   "title": "TorrenClou",
   "pages": [
     "index",
+    "---Get started---",
     "getting-started",
-    "usage",
-    "---Providers---",
+    "first-run",
+    "---Storage---",
     "providers",
-    "---Monitoring---",
-    "grafana",
-    "---Reference---",
+    "---Using it---",
+    "usage",
     "configuration",
+    "---Operating---",
+    "updating",
+    "grafana",
+    "security",
+    "troubleshooting",
+    "---Reference---",
+    "architecture",
     "faq"
   ]
 }
