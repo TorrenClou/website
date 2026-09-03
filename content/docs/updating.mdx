@@ -70,12 +70,32 @@ docker run -d ... ghcr.io/torrenclou/torrentclou:2026.01.15-a1b2c3d-e4f5g6h
 The tag list is on the [package page](https://github.com/orgs/TorrenClou/packages).
 
 **Migrations do not roll back.** If the version you are leaving added a database change, the
-older image may not start against the newer schema — and if it does start, it is running
-against a shape it does not know about. Restore the pre-upgrade dump as well. That is the
-reason to take one.
+older image is running against a schema it does not know about.
+
+TorrenClou will not let that happen quietly. On start it compares the migrations recorded in
+the database against the ones the running build knows about, and if the database has any it
+has never heard of, it refuses to start:
+
+```
+Database schema is ahead of this build (20260301120000_AddQuotaTracking).
+Refusing to start. Set ALLOW_SCHEMA_AHEAD=true to override.
+```
+
+That is the correct outcome. The fix is to restore the dump you took before upgrading, which
+is why the backup step above matters.
+
+If you understand the risk and want to start anyway — for instance because the newer migration
+only added a column the older code never reads:
+
+```bash
+docker run -d ... -e ALLOW_SCHEMA_AHEAD=true ghcr.io/torrenclou/torrentclou:1.4.1
+```
+
+Nothing validates that judgement for you. The older code will read and write the newer schema
+as though it were its own.
 
 In practice: rolling back one release is usually fine, rolling back across a release that
-changed the schema is not, and the dump is what makes the difference.
+changed the schema needs the dump, and the guard tells you which situation you are in.
 
 ## Pinning a version
 
@@ -85,13 +105,30 @@ would rather choose when to take an update.
 ## What version am I on?
 
 ```bash
+curl -s http://localhost:47200/api/version
+```
+
+```json
+{
+  "version": "1.0.0",
+  "buildSha": "757731c15ba2365e0ea9b1d7cfc76778e22871fb",
+  "buildTime": "2026-09-03T09:00:00Z",
+  "databaseSchema": "20260214093000_AddStorageProfiles",
+  "pendingMigrations": 0,
+  "schemaAhead": false
+}
+```
+
+`databaseSchema` is the newest migration recorded in the database, and `schemaAhead` says
+whether the database is newer than the running code. Those two are what tell you whether a
+rollback is safe.
+
+The image tag is also readable directly:
+
+```bash
 docker inspect torrencloud --format '{{.Config.Image}}'
 ```
 
-```bash
-docker inspect ghcr.io/torrenclou/torrentclou:latest \
-  --format '{{index .Config.Labels "org.opencontainers.image.revision"}}'
-```
 
 ## Release cadence
 

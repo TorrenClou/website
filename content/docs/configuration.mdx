@@ -120,6 +120,7 @@ an instance whose owner already has a way in must not offer itself to whoever ar
 |----------|---------|-------|
 | `HANGFIRE_WORKER_COUNT` | 10 | Overridden by the Settings value once you save one |
 | `APPLY_MIGRATIONS` | `true` | Run database migrations on start |
+| `ALLOW_SCHEMA_AHEAD` | `false` | Start even when the database has migrations this build does not know about. See [Updating](/docs/updating#rolling-back) |
 | `BACKEND_URL` | `http://127.0.0.1:47200` | Where the frontend finds the API |
 | `JWT_ISSUER` / `JWT_AUDIENCE` | `TorrenClou_API` / `TorrenClou_Client` | No reason to change these |
 
