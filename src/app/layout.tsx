@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { RootProvider } from "fumadocs-ui/provider/next";
+import { siteConfig, absoluteUrl } from "@/lib/site";
 import "./globals.css";
 
 // Vendored rather than fetched with next/font/google, which downloads from
@@ -15,7 +16,7 @@ const inter = localFont({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://tc.gitnasr.com"),
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: "TorrenClou — Torrent to Cloud, One Command Away",
     template: "%s — TorrenClou",
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "TorrenClou",
     locale: "en_US",
-    url: "https://tc.gitnasr.com",
+    url: absoluteUrl("/"),
     images: [{ url: "/api/og", width: 1200, height: 630, alt: "TorrenClou — Torrent to Cloud, One Command Away" }],
   },
   twitter: {

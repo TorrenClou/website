@@ -1,73 +1,146 @@
 ---
-title: Configuration Reference
-description: Full reference for all TorrenClou environment variables.
+title: Configuration
+description: Every setting in the app, every environment override, and which one wins.
 ---
 
-All configuration is done through environment variables in your `.env` file.
+Almost everything is in the app, under **Settings**. Environment variables exist only for the
+handful of things the container cannot work out for itself.
 
-## Required Variables
+**Nothing here is required.** A `docker run` with no `-e` flags and no `--env-file` is a complete
+configuration.
 
-| Variable | Description |
-|---|---|
-| `POSTGRES_PASSWORD` | PostgreSQL password (used internally) |
-| `JWT_SECRET` | JWT signing key, minimum 32 characters |
-| `NEXTAUTH_SECRET` | NextAuth.js secret, must differ from JWT_SECRET |
-| `ADMIN_EMAIL` | Admin login email |
-| `ADMIN_PASSWORD` | Admin login password |
+## In the app
 
-## Optional Variables
+### Account
 
-| Variable | Default | Description |
-|---|---|---|
-| `ADMIN_NAME` | `Admin` | Admin display name |
-| `NEXTAUTH_URL` | `http://localhost:47100` | Public frontend URL (set automatically by installer on remote servers) |
-| `PUBLIC_FRONTEND_URL` | — | Override for sslip.io / custom public URL |
-| `BACKEND_URL` | `http://127.0.0.1:47200` | Backend URL for server-side auth requests |
-| `GOOGLE_CLIENT_ID` | — | Google OAuth client ID (required only for Google Drive) |
-| `POSTGRES_DB` | `torrenclo` | Database name |
-| `POSTGRES_USER` | `torrenclo_user` | Database username |
-| `JWT_ISSUER` | `TorrenClou_API` | JWT issuer claim |
-| `JWT_AUDIENCE` | `TorrenClou_Client` | JWT audience claim |
-| `HANGFIRE_WORKER_COUNT` | `10` | Background job concurrency |
+Change your password. Requires the current one; minimum 12 characters.
 
-## Observability (Optional)
+### Transfers
 
-| Variable | Description |
-|---|---|
-| `OBSERVABILITY_LOKI_URL` | Loki log aggregation endpoint |
-| `OBSERVABILITY_OTLP_ENDPOINT` | OpenTelemetry trace exporter endpoint |
-| `OBSERVABILITY_ENABLE_PROMETHEUS` | Expose `/metrics` endpoint (`true`/`false`) |
-| `OBSERVABILITY_ENABLE_TRACING` | Enable distributed tracing (`true`/`false`) |
+| Setting | Default | What it does |
+|---------|---------|--------------|
+| Reroute failed uploads | on | When a drive stops accepting uploads, move the job to another healthy one instead of failing it |
+| Reroute attempts per job | 3 | Cap on automatic reroutes. Stops one job walking every drive you own when the real fault is the file |
+| Failures before a drive is unhealthy | 3 | Consecutive upload failures on one drive before it stops being offered |
+| Concurrent transfers | 10 | **Restart required.** How many torrents run at once |
 
-## Data Persistence
+Concurrent transfers is the one to understand. A download occupies a worker for its entire
+transfer, so this is a hard ceiling: with it set to 10, the eleventh torrent waits, however idle
+the machine looks. Raise it if you have bandwidth and disk to spare; lower it on a small VPS.
 
-Data is stored in Docker volumes:
+Changes to the others take effect within about 30 seconds, with no restart.
 
-| Volume | Container Path | Purpose |
-|---|---|---|
-| `torrencloud-pgdata` | `/data/postgres` | PostgreSQL database |
-| `torrencloud-redis` | `/data/redis` | Redis data |
-| `torrencloud-downloads` | `/data/downloads` | Downloaded torrent files |
+### Downloads
 
-## Custom Domain Setup
+**Delete downloads after upload** (on by default) removes a job's local directory once every file
+has reached your cloud storage. Turn it off to keep local copies — they then only go away when
+you purge.
 
-If deploying on a server with a domain name, set these in `.env`:
+### Local Storage
 
-```ini
-NEXTAUTH_URL=https://your-domain.com:47100
-PUBLIC_FRONTEND_URL=https://your-domain.com:47100
-```
+Shows what the downloads volume holds, split three ways:
 
-The frontend automatically discovers the backend API at runtime using the browser's current origin — no rebuild needed. Google Drive OAuth will use `https://your-domain.com:47100/proxy/api/storage/gdrive/callback` as the redirect URI.
+- **Purgeable** — directories for completed and cancelled jobs. What **Purge** deletes.
+- **Retained** — jobs still running, retrying or failed. Kept, because those jobs may still need
+  the files.
+- **Orphaned** — directories with no matching job. Counted so the space is visible, never deleted
+  automatically.
 
-## Generating Secrets
+**Purge** only ever removes the purgeable set.
+
+## Environment variables
+
+All optional. Setting one overrides the built-in behaviour for that value only.
+
+### Public address
+
+| Variable | Default | When you need it |
+|----------|---------|------------------|
+| `PUBLIC_FRONTEND_URL` | derived from the request | A proxy that does not send `X-Forwarded-Host` |
+| `NEXTAUTH_URL` | derived from the request | Same |
+| `FRONTEND_URL` | falls back to `PUBLIC_FRONTEND_URL` | Overrides just the OAuth return address |
+
+Normally the app works out its own address from the incoming request, which is why it works on
+any host or IP with no configuration.
+
+### Database
+
+| Variable | Default |
+|----------|---------|
+| `POSTGRES_DB` | `torrenclo` |
+| `POSTGRES_USER` | `torrenclo_user` |
+| `POSTGRES_PASSWORD` | generated on first run |
+
+### Secrets
+
+| Variable | Default |
+|----------|---------|
+| `JWT_SECRET` | generated on first run |
+| `NEXTAUTH_SECRET` | generated on first run |
+| `GRAFANA_ADMIN_USER` | `admin` |
+| `GRAFANA_ADMIN_PASSWORD` | generated on first run |
+
+Generated values live in `/data/postgres/secrets.env` on the `torrencloud-pgdata` volume:
 
 ```bash
-# Linux / macOS
-openssl rand -base64 32
+docker exec torrencloud cat /data/postgres/secrets.env
 ```
 
-```powershell
-# PowerShell
-[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Max 256 }) -as [byte[]])
+Set `JWT_SECRET` and `NEXTAUTH_SECRET` explicitly if you want sessions to survive a rebuilt data
+volume.
+
+### Observability
+
+| Variable | Default |
+|----------|---------|
+| `OBSERVABILITY_LOKI_URL` | unset |
+| `OBSERVABILITY_LOKI_USERNAME` | unset |
+| `OBSERVABILITY_LOKI_API_KEY` | unset |
+| `OBSERVABILITY_OTLP_ENDPOINT` | unset |
+| `OBSERVABILITY_OTLP_HEADERS` | unset |
+
+For shipping logs and traces off-box. The bundled [Grafana and Prometheus](/docs/grafana) work
+without any of this.
+
+### Legacy admin
+
+| Variable | Default |
+|----------|---------|
+| `ADMIN_EMAIL` | unset |
+| `ADMIN_PASSWORD` | unset |
+| `ADMIN_NAME` | unset |
+
+Only for installs that predate the setup wizard. **Setting these disables the wizard**, because
+an instance whose owner already has a way in must not offer itself to whoever arrives first. See
+[First-run setup](/docs/first-run#upgrading-an-older-install).
+
+### Other
+
+| Variable | Default | Notes |
+|----------|---------|-------|
+| `HANGFIRE_WORKER_COUNT` | 10 | Overridden by the Settings value once you save one |
+| `APPLY_MIGRATIONS` | `true` | Run database migrations on start |
+| `BACKEND_URL` | `http://127.0.0.1:47200` | Where the frontend finds the API |
+| `JWT_ISSUER` / `JWT_AUDIENCE` | `TorrenClou_API` / `TorrenClou_Client` | No reason to change these |
+
+## Precedence
+
+For the three settings that exist in both places — worker count and the two observability
+toggles — the order is:
+
+1. The value saved in **Settings**, read at container start
+2. The environment variable
+3. The built-in default
+
+So once you save a worker count in the app, `HANGFIRE_WORKER_COUNT` no longer has any effect.
+
+## Using a .env file
+
+You do not need one. If you would rather keep overrides in a file:
+
+```bash
+docker run -d --env-file .env ... ghcr.io/torrenclou/torrentclou:latest
 ```
+
+[`.env.example`](https://github.com/TorrenClou/deploy/blob/main/.env.example) lists the available
+overrides, all commented out.

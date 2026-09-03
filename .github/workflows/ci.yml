@@ -63,6 +63,24 @@ jobs:
           done
           exit $fail
 
+      # snippets/ holds the handful of strings that must appear verbatim in more
+      # than one place. They are checked rather than injected, so this fails if
+      # the docs and the canonical file have drifted apart.
+      - name: Check docs match snippets/
+        run: |
+          set -euo pipefail
+          fail=0
+          for f in snippets/install-linux.txt snippets/install-windows.txt; do
+            value=$(cat "$f")
+            if ! grep -rqF "$value" content/docs/; then
+              echo "::error file=$f::not found verbatim anywhere in content/docs/"
+              echo "  expected: $value"
+              fail=1
+            fi
+          done
+          [ "$fail" -eq 0 ] && echo "Snippets match."
+          exit $fail
+
       # Relative links break wherever a Markdown file is rendered outside its
       # own directory. This repo's README is read on GitHub and scraped
       # elsewhere; the org profile shipped 404s for exactly this reason.

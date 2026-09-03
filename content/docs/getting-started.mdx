@@ -1,150 +1,143 @@
 ---
 title: Getting Started
-description: Install and run TorrenClou in under 5 minutes with Docker.
+description: Install TorrenClou with one command, then reach it, put it behind a proxy, or point it at a bigger disk.
 ---
 
-## One-Command Install
+## Requirements
 
-**Linux / macOS:**
+- Docker, and a machine that can run Linux containers
+- About 2 GB of RAM
+- Enough disk for the torrents you intend to download — they land on a volume before being
+  uploaded, and are deleted afterwards by default
+
+Images are built for `linux/amd64` and `linux/arm64`, so an ARM VPS or a Raspberry Pi works.
+
+## The one-liner
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash
 ```
 
-**Windows (PowerShell):**
+Windows, in PowerShell:
 
 ```powershell
 irm https://raw.githubusercontent.com/TorrenClou/deploy/main/install.ps1 | iex
 ```
 
-The installer handles everything: clones the repo, generates secrets, creates `.env`, pulls the Docker image, and starts TorrenClou with Grafana monitoring.
+It checks Docker is running, pulls the image, starts it, waits for it to become healthy, and
+prints the URL to open. **There is no configuration step** — no `.env` to fill in, no secrets to
+generate. The container creates its own on first boot and keeps them on its data volume.
 
-**On a remote server**, the installer auto-detects your server's IP and prints accessible URLs using [sslip.io](https://sslip.io) — no DNS setup needed:
+Open the URL it prints and [create your account](/docs/first-run).
 
-```
-Frontend   http://192-168-1-100.sslip.io:47100
-API        http://192-168-1-100.sslip.io:47200/api
-Grafana    http://192-168-1-100.sslip.io:47500
-```
+If you would rather read the script before running it — a reasonable habit — it is
+[install.sh](https://github.com/TorrenClou/deploy/blob/main/install.sh), about 90 lines.
 
-It also prints the exact **Google Drive redirect URI** to register in Google Cloud Console.
+## Manual install
 
-### Default Credentials
-
-| Service | URL | User | Password |
-|---|---|---|---|
-| TorrenClou | `http://localhost:47100` | `admin@torrencloud.local` | `TorrenCloud@2024` |
-| Hangfire | `http://localhost:47200/hangfire` | _(same as above)_ | _(same as above)_ |
-| Grafana | `http://localhost:47500` | `admin` | `admin` |
-| Prometheus | `http://localhost:47600` | — | — |
-
-> **Important:** Change default credentials in `./torrencloud/.env` and run `docker restart torrencloud`.
-
----
-
-## Manual Setup
-
-If you prefer full control, follow the steps below.
-
-### Prerequisites
-
-- **Docker** 20.10 or later — [Install Docker](https://docs.docker.com/get-docker/)
-- **2 GB free RAM** minimum
-- **3 GB free disk space** for the Docker image
-
-### 1. Clone the deploy repository
+The installer runs exactly this:
 
 ```bash
-git clone https://github.com/TorrenClou/deploy.git
-cd deploy
+docker run -d \
+    --name torrencloud \
+    --restart unless-stopped \
+    -p 47100:47100 \
+    -p 47200:47200 \
+    -p 47500:47500 \
+    -p 47600:47600 \
+    -v torrencloud-pgdata:/data/postgres \
+    -v torrencloud-redis:/data/redis \
+    -v torrencloud-downloads:/data/downloads \
+    ghcr.io/torrenclou/torrentclou:latest
 ```
 
-### 2. Configure environment
+No `-e` flags and no `--env-file`. The container works out the rest.
+
+If you only want the app, drop the `-p 47500` and `-p 47600` lines — those are Grafana and
+Prometheus, and the app does not need them. See [Security](/docs/security#what-each-port-exposes)
+for why publishing fewer ports is the better default.
+
+## Ports
+
+| Port | Service |
+|------|---------|
+| 47100 | Web interface |
+| 47200 | API, plus `/hangfire` |
+| 47500 | Grafana |
+| 47600 | Prometheus |
+
+**Only 47100 needs to be reachable for normal use.** The browser talks to the API through the
+frontend's same-origin proxy, so 47200 does not need to be open.
+
+## Reaching it
+
+The installer prints an `sslip.io` address — a public DNS service that resolves
+`203-0-113-5.sslip.io` to `203.0.113.5`. That gives you a working hostname on a fresh server with
+no DNS set up. It is only a convenience for the printed link; the app works on whatever address
+you reach it by.
+
+Open port 47100 in your firewall:
 
 ```bash
-cp .env.example .env
+sudo ufw allow 47100/tcp
 ```
 
-Open `.env` and fill in the required values:
+## Custom domain
 
-| Variable | Required | Description |
-|---|---|---|
-| `POSTGRES_PASSWORD` | Yes | Any strong password |
-| `JWT_SECRET` | Yes | Random string, minimum 32 characters |
-| `NEXTAUTH_SECRET` | Yes | A different random string |
-| `ADMIN_EMAIL` | Yes | Your login email |
-| `ADMIN_PASSWORD` | Yes | Your login password |
+Point an A record at the server and open the app on it. Nothing to configure — the app derives
+its own address from the request.
 
-Generate secrets with:
+## Behind a reverse proxy
+
+A minimal nginx server block:
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name torrents.example.com;
+
+    # ... your certificate directives ...
+
+    location / {
+        proxy_pass http://127.0.0.1:47100;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Forwarded-Host  $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+
+        # Large uploads and long-lived progress streams
+        client_max_body_size 100M;
+        proxy_read_timeout   3600s;
+    }
+}
+```
+
+The `X-Forwarded-Host` and `X-Forwarded-Proto` headers matter: the app uses them to work out its
+own public address, which is what the Google Drive OAuth callback returns to. If your proxy
+cannot send them, set the address explicitly instead:
 
 ```bash
-# Linux / macOS
-openssl rand -base64 32
+docker run -d ... \
+    -e PUBLIC_FRONTEND_URL=https://torrents.example.com \
+    -e NEXTAUTH_URL=https://torrents.example.com \
+    ghcr.io/torrenclou/torrentclou:latest
 ```
 
-```powershell
-# PowerShell
-[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Max 256 }) -as [byte[]])
-```
+Traefik and Caddy both send those headers by default.
 
-### 3. Run
+## Storing downloads on a specific disk
 
-**Linux / macOS:**
+Bind-mount a path instead of using the named volume:
 
 ```bash
-chmod +x run.sh && ./run.sh
+-v /mnt/big-disk/torrents:/data/downloads
 ```
 
-**Windows (PowerShell):**
+Torrents can be large, and this is the volume that grows.
 
-```powershell
-.\run.ps1
-```
+## Next steps
 
-**Or directly with Docker:**
-
-```bash
-docker run -d --name torrencloud \
-  -p 47100:47100 -p 47200:47200 -p 47500:47500 -p 47600:47600 \
-  -v torrencloud-pgdata:/data/postgres \
-  -v torrencloud-redis:/data/redis \
-  -v torrencloud-downloads:/data/downloads \
-  --env-file .env \
-  ghcr.io/torrenclou/torrentclou:latest
-```
-
-### 4. Open
-
-Wait ~30 seconds for all services to start:
-
-| Service | URL |
-|---|---|
-| Frontend | `http://localhost:47100` |
-| API | `http://localhost:47200/api` |
-| API Health | `http://localhost:47200/api/health/ready` |
-| Hangfire Dashboard | `http://localhost:47200/hangfire` |
-| Grafana | `http://localhost:47500` |
-| Prometheus | `http://localhost:47600` |
-
-Log in with the `ADMIN_EMAIL` and `ADMIN_PASSWORD` you set in `.env`.
-
-## Verify
-
-```bash
-curl http://localhost:47200/api/health/ready
-# Should return { "status": "Healthy" }
-```
-
-## Troubleshooting
-
-**"Connection refused" on port 47200** — The API takes 15-20 seconds to start on first boot (runs database migrations). Wait and retry.
-
-**"CHANGE_ME" errors** — Ensure all required values in `.env` are filled in.
-
-**Port conflicts** — Change the port mapping: `-p 47101:47100` and update `NEXTAUTH_URL=http://localhost:47101` in `.env`.
-
-Check logs for more details:
-
-```bash
-docker logs -f torrencloud
-```
+- [First-run setup](/docs/first-run) — create your account and connect storage
+- [Usage guide](/docs/usage) — adding torrents and watching transfers
+- [Security](/docs/security) — read this before exposing an instance to the internet
+- [Updating](/docs/updating) — upgrades, backups and rollbacks
