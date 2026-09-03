@@ -42,6 +42,30 @@ Use the named volume, or fix the ownership of the bind-mounted path.
 **It restarts in a loop** — `docker logs` shows the last failure before each restart. A `set -e`
 failure in the entrypoint aborts before supervisord starts, so look at the very first lines.
 
+## It refuses to start, saying the schema is ahead
+
+```
+Database schema is ahead of this build (20260301120000_AddQuotaTracking).
+Refusing to start. Set ALLOW_SCHEMA_AHEAD=true to override.
+```
+
+You rolled back to an image older than the database. The newer version applied a migration this
+build has never heard of, so it is stopping rather than running against a shape it does not
+understand — which would otherwise surface later as data that looks corrupted.
+
+Either go back to the newer image, or restore the database dump you took before upgrading. See
+[Updating](/docs/updating#rolling-back).
+
+`ALLOW_SCHEMA_AHEAD=true` starts it anyway. Only reasonable if you know the newer migration is
+additive and the older code never touches what it added.
+
+Check what the database is actually on:
+
+```bash
+curl -s http://localhost:47200/api/version
+```
+
+
 ## The setup wizard will not appear
 
 ```bash
