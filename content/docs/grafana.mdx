@@ -1,11 +1,11 @@
 ---
 title: Grafana Monitoring
-description: Monitor your TorrenCloud instance with built-in Grafana dashboards.
+description: Monitor your TorrenClou instance with built-in Grafana dashboards.
 ---
 
 ## Overview
 
-Grafana, Prometheus, and Loki are **bundled inside the TorrenCloud Docker container** — no extra setup needed. After installation, monitoring is available immediately:
+Grafana, Prometheus, and Loki are **bundled inside the TorrenClou Docker container** — no extra setup needed. After installation, monitoring is available immediately:
 
 | Service | URL | Credentials |
 |---|---|---|
@@ -16,7 +16,7 @@ Prometheus metrics and tracing are enabled by default when using the one-command
 
 ## Prometheus Metrics
 
-TorrenCloud exposes a `/metrics` endpoint on the API port:
+TorrenClou exposes a `/metrics` endpoint on the API port:
 
 ```
 http://localhost:47200/metrics
@@ -42,7 +42,7 @@ http://localhost:47200/metrics
 
 ## Loki Logs
 
-With `OBSERVABILITY_LOKI_URL` configured in your `.env`, TorrenCloud pushes structured logs to the built-in Loki instance.
+With `OBSERVABILITY_LOKI_URL` configured in your `.env`, TorrenClou pushes structured logs to the built-in Loki instance.
 
 ### Add Loki Data Source in Grafana
 
@@ -67,7 +67,7 @@ Filter errors:
 
 ## OpenTelemetry Traces
 
-With `OBSERVABILITY_ENABLE_TRACING=true` (enabled by default), TorrenCloud exports distributed traces.
+With `OBSERVABILITY_ENABLE_TRACING=true` (enabled by default), TorrenClou exports distributed traces.
 
 Traces cover the full lifecycle: torrent download → file processing → cloud upload.
 

@@ -1,18 +1,24 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { RootProvider } from "fumadocs-ui/provider/next";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
+// Vendored rather than fetched with next/font/google, which downloads from
+// Google Fonts during `next build`. See src/app/fonts/README.md.
+const inter = localFont({
+  src: "./fonts/inter-latin-variable.woff2",
+  weight: "100 900",
+  style: "normal",
+  display: "swap",
   variable: "--font-inter",
+  fallback: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tc.gitnasr.com"),
   title: {
-    default: "TorrenCloud — Torrent to Cloud, One Command Away",
-    template: "%s — TorrenCloud",
+    default: "TorrenClou — Torrent to Cloud, One Command Away",
+    template: "%s — TorrenClou",
   },
   description:
     "Self-hosted torrent-to-cloud sync. Download torrents and auto-sync to Google Drive or S3. One Docker container, one command.",
@@ -30,10 +36,10 @@ export const metadata: Metadata = {
   creator: "TorrenClou",
   openGraph: {
     type: "website",
-    siteName: "TorrenCloud",
+    siteName: "TorrenClou",
     locale: "en_US",
     url: "https://tc.gitnasr.com",
-    images: [{ url: "/api/og", width: 1200, height: 630, alt: "TorrenCloud — Torrent to Cloud, One Command Away" }],
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: "TorrenClou — Torrent to Cloud, One Command Away" }],
   },
   twitter: {
     card: "summary_large_image",

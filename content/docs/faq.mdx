@@ -1,11 +1,11 @@
 ---
 title: FAQ
-description: Frequently asked technical questions about TorrenCloud.
+description: Frequently asked technical questions about TorrenClou.
 ---
 
 ## Is my data private?
 
-Yes. TorrenCloud is fully self-hosted. Your torrent files, download data, and cloud credentials are stored exclusively inside your Docker container's volumes. No data is transmitted to any third-party service.
+Yes. TorrenClou is fully self-hosted. Your torrent files, download data, and cloud credentials are stored exclusively inside your Docker container's volumes. No data is transmitted to any third-party service.
 
 ## Which cloud providers are supported?
 
@@ -36,7 +36,7 @@ The current version is designed for single-admin use. Multi-user support with pe
 
 Failed jobs can be retried from the dashboard. The job queue (Hangfire + Redis) survives container restarts and tracks full retry history.
 
-## Can I access TorrenCloud remotely?
+## Can I access TorrenClou remotely?
 
 Yes. Expose ports 47100 and 47200, set `NEXTAUTH_URL` to your public URL, and access from any browser. For production, place a reverse proxy (nginx, Caddy) in front and terminate TLS there.
 
@@ -50,4 +50,4 @@ docker run ... -v /path/to/local/dir:/data/downloads ...
 
 ## Is there a hosted version?
 
-No. TorrenCloud is 100% self-hosted by design. There is no cloud service, no accounts, no subscriptions. You own everything.
+No. TorrenClou is 100% self-hosted by design. There is no cloud service, no accounts, no subscriptions. You own everything.
