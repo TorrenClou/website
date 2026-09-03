@@ -1,0 +1,26 @@
+name: Release Please
+
+# Accumulates merged commits into a release pull request, which is what produces
+# CHANGELOG.md and a tag. The site itself deploys continuously from main — this
+# is for a readable history of what changed in the documentation, not a gate on
+# publishing.
+#
+# docs: commits are shown in the changelog here rather than hidden, because in
+# this repo they are the product.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
