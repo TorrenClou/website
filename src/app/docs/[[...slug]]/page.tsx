@@ -6,7 +6,9 @@ import {
 } from "fumadocs-ui/page";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import defaultMdxComponents from "fumadocs-ui/mdx";
 import { source } from "@/lib/source";
+import { ConfigTable, ConfigSchemaVersion } from "@/components/ConfigTable";
 import { siteConfig, absoluteUrl } from "@/lib/site";
 import lastmod from "@/lib/lastmod.json";
 import type { DocsPageProps } from "@/types";
@@ -95,7 +97,19 @@ export default async function Page({ params }: DocsPageProps) {
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDXContent />
+        {/*
+          Components have to be handed to the body explicitly. The root
+          mdx-components.tsx is the @next/mdx convention, which fumadocs-mdx
+          does not read — registering them only there compiles fine and then
+          fails at prerender with "Expected component to be defined".
+        */}
+        <MDXContent
+          components={{
+            ...defaultMdxComponents,
+            ConfigTable,
+            ConfigSchemaVersion,
+          }}
+        />
       </DocsBody>
     </DocsPage>
   );

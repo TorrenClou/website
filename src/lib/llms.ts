@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
+import schema from "@/../content/generated/config-schema.json";
 import { source } from "@/lib/source";
 import { siteConfig, absoluteUrl } from "@/lib/site";
 
@@ -14,6 +15,68 @@ function stripFrontmatter(raw: string): string {
   const end = raw.indexOf(`\n${fence}`, fence.length);
   if (end === -1) return raw.trim();
   return raw.slice(end + fence.length + 1).trim();
+}
+
+interface ConfigEntry {
+  envName: string;
+  description: string;
+  default: string;
+  secret: boolean;
+  required: boolean;
+  deprecated?: string;
+}
+
+const configSchema = schema as { productVersion: string; entries: ConfigEntry[] };
+
+/**
+ * Expands the MDX components in the configuration page into plain Markdown.
+ *
+ * llms-full.txt is assembled from the raw MDX, so a rendered component arrives
+ * as a literal `<ConfigTable filter="required" />` tag. That silently removed
+ * the entire configuration reference from the text an assistant reads, which is
+ * the one page most likely to be asked about.
+ */
+const NEWLINE = String.fromCharCode(10);
+
+function expandComponents(body: string): string {
+  const table = (filter: string): string => {
+    const rows = configSchema.entries.filter((entry) => {
+      const deprecated = Boolean(entry.deprecated);
+      if (filter === "required") return entry.required && !deprecated;
+      if (filter === "optional") return !entry.required && !deprecated;
+      if (filter === "deprecated") return deprecated;
+      return true;
+    });
+
+    if (rows.length === 0) return "_None._";
+
+    const lines = [
+      "| Variable | Default | What it does |",
+      "|---|---|---|",
+      ...rows.map((entry) => {
+        const flags = [
+          entry.required ? "**required**" : "",
+          entry.secret ? "**secret**" : "",
+        ]
+          .filter(Boolean)
+          .join(" ");
+        const name = flags ? `\`${entry.envName}\` ${flags}` : `\`${entry.envName}\``;
+        const description = entry.deprecated
+          ? `${entry.description} ${entry.deprecated}`
+          : entry.description;
+        return `| ${name} | ${entry.default || "unset"} | ${description} |`;
+      }),
+    ];
+    return lines.join(NEWLINE);
+  };
+
+  return body
+    .replace(/<ConfigTable\s+filter="([a-z]+)"\s*\/>/g, (_m, filter: string) => table(filter))
+    .replace(/<ConfigTable\s*\/>/g, () => table("all"))
+    .replace(
+      /<ConfigSchemaVersion\s*\/>/g,
+      `Generated from TorrenClou ${configSchema.productVersion}, describing ${configSchema.entries.length} configuration values.`,
+    );
 }
 
 /** "/docs/providers/s3" -> "providers/s3.mdx"; "/docs" -> "index.mdx" */
@@ -145,7 +208,7 @@ export async function buildLlmsFullTxt(): Promise<string> {
   for (const entry of entries) {
     let body: string;
     try {
-      body = stripFrontmatter(await readFile(join(DOCS_DIR, entry.file), "utf8"));
+      body = expandComponents(stripFrontmatter(await readFile(join(DOCS_DIR, entry.file), "utf8")));
     } catch {
       // A page listed by the loader with no readable file on disk. Skip it
       // rather than emitting a heading with nothing under it.

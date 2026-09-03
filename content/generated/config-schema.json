@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 1,
+  "generatedBy": "TorreClou.Core.Configuration.ConfigSchema",
+  "productVersion": "1.1.1",
+  "entries": [
+    {
+      "envName": "JWT_SECRET",
+      "configKey": "Jwt:Key",
+      "description": "Key used to sign API tokens. Rotating it invalidates every session.",
+      "default": "generated on first run and kept on the postgres volume",
+      "type": "string",
+      "secret": true,
+      "required": true
+    },
+    {
+      "envName": "POSTGRES_PASSWORD",
+      "configKey": "ConnectionStrings:DefaultConnection",
+      "description": "Assembled by the entrypoint from POSTGRES_DB, POSTGRES_USER and POSTGRES_PASSWORD.",
+      "default": "password generated on first run; database torrenclo, user torrenclo_user",
+      "type": "string",
+      "secret": true,
+      "required": true
+    },
+    {
+      "envName": "ADMIN_EMAIL",
+      "configKey": "Email",
+      "description": "Legacy admin login. Setting it disables the first-run wizard.",
+      "default": "unset; use the wizard instead",
+      "type": "string",
+      "secret": false,
+      "required": false,
+      "deprecated": "Only for installs that predate the first-run wizard. New installs create the account in the browser."
+    },
+    {
+      "envName": "ADMIN_NAME",
+      "configKey": "Name",
+      "description": "Display name for the legacy admin account.",
+      "default": "TorrenClou Admin",
+      "type": "string",
+      "secret": false,
+      "required": false,
+      "deprecated": "Only for installs that predate the first-run wizard."
+    },
+    {
+      "envName": "ADMIN_PASSWORD",
+      "configKey": "Password",
+      "description": "Legacy admin password. Converted to a stored hash on first successful login.",
+      "default": "unset; use the wizard instead",
+      "type": "string",
+      "secret": true,
+      "required": false,
+      "deprecated": "Only for installs that predate the first-run wizard."
+    },
+    {
+      "envName": "ALLOW_SCHEMA_AHEAD",
+      "configKey": "AllowSchemaAhead",
+      "description": "Start even when the database has migrations this build does not know about. Only safe if the newer migration is additive and this code never touches what it added.",
+      "default": "false",
+      "type": "boolean",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "APPLY_MIGRATIONS",
+      "configKey": "ApplyMigrations",
+      "description": "Run pending database migrations at startup.",
+      "default": "true",
+      "type": "boolean",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "ASPNETCORE_ENVIRONMENT",
+      "configKey": "Environment",
+      "description": "Standard ASP.NET Core environment name.",
+      "default": "Production",
+      "type": "string",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "FRONTEND_URL",
+      "configKey": "FrontendUrl",
+      "description": "Public address used to build the Google Drive OAuth return URL.",
+      "default": "derived from the incoming request",
+      "type": "string",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "HANGFIRE_WORKER_COUNT",
+      "configKey": "Hangfire:WorkerCount",
+      "description": "How many torrents transfer at once. A download holds a worker for its whole transfer, so this is a hard ceiling. The value saved in the Settings tab wins once you save one.",
+      "default": "10",
+      "type": "integer",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "JWT_AUDIENCE",
+      "configKey": "Jwt:Audience",
+      "description": "Audience claim written into tokens and checked on validation.",
+      "default": "TorrenClou_Client",
+      "type": "string",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "JWT_ISSUER",
+      "configKey": "Jwt:Issuer",
+      "description": "Issuer claim written into tokens and checked on validation.",
+      "default": "TorrenClou_API",
+      "type": "string",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "OBSERVABILITY_ENABLE_LOGGING",
+      "configKey": "Observability:EnableLogging",
+      "description": "Emit OpenTelemetry logs.",
+      "default": "true",
+      "type": "boolean",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "OBSERVABILITY_ENABLE_PROMETHEUS",
+      "configKey": "Observability:EnablePrometheus",
+      "description": "Expose the /metrics endpoint. Overridden by the Settings tab once saved.",
+      "default": "true",
+      "type": "boolean",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "OBSERVABILITY_ENABLE_TRACING",
+      "configKey": "Observability:EnableTracing",
+      "description": "Emit distributed traces. Overridden by the Settings tab once saved.",
+      "default": "true",
+      "type": "boolean",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "OBSERVABILITY_LOKI_API_KEY",
+      "configKey": "Observability:LokiApiKey",
+      "description": "Basic-auth key for a hosted Loki.",
+      "default": "unset",
+      "type": "string",
+      "secret": true,
+      "required": false
+    },
+    {
+      "envName": "OBSERVABILITY_LOKI_URL",
+      "configKey": "Observability:LokiUrl",
+      "description": "Push structured logs to this Loki instance.",
+      "default": "the bundled Loki, or unset outside the all-in-one image",
+      "type": "string",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "OBSERVABILITY_LOKI_USERNAME",
+      "configKey": "Observability:LokiUsername",
+      "description": "Basic-auth user for a hosted Loki.",
+      "default": "unset",
+      "type": "string",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "OBSERVABILITY_OTLP_ENDPOINT",
+      "configKey": "Observability:OtlpEndpoint",
+      "description": "Send traces and metrics to this OTLP collector.",
+      "default": "unset",
+      "type": "string",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "OBSERVABILITY_OTLP_HEADERS",
+      "configKey": "Observability:OtlpHeaders",
+      "description": "Headers for the OTLP exporter, URL-encoded. Usually carries an API key.",
+      "default": "unset",
+      "type": "string",
+      "secret": true,
+      "required": false
+    },
+    {
+      "envName": "Redis__ConnectionString",
+      "configKey": "Redis:ConnectionString",
+      "description": "Redis endpoint. Set directly only in the split topology; the all-in-one image points this at its own bundled Redis and ignores anything you set.",
+      "default": "127.0.0.1:6379",
+      "type": "string",
+      "secret": false,
+      "required": false
+    },
+    {
+      "envName": "TORRENT_DOWNLOAD_PATH",
+      "configKey": "TorrentDownloadPath",
+      "description": "Where torrents are written before upload. Shared by the torrent worker and both upload workers.",
+      "default": "/data/downloads",
+      "type": "string",
+      "secret": false,
+      "required": false
+    }
+  ]
+}
