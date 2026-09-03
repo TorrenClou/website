@@ -68,16 +68,13 @@ docker run -d --name torrencloud \
   -v torrencloud-pgdata:/data/postgres \
   -v torrencloud-redis:/data/redis \
   -v /path/to/your/downloads:/data/downloads \
-  --env-file .env \
   ghcr.io/torrenclou/torrentclou:latest
 ```
 
 ## Updating
 
 ```bash
-docker pull ghcr.io/torrenclou/torrentclou:latest
-docker stop torrencloud && docker rm torrencloud
-./run.sh
+curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash
 ```
 
 Data persists in Docker volumes across container re-creations.

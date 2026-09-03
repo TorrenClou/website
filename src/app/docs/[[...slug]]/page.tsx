@@ -7,7 +7,20 @@ import {
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { source } from "@/lib/source";
+import { siteConfig, absoluteUrl } from "@/lib/site";
+import lastmod from "@/lib/lastmod.json";
 import type { DocsPageProps } from "@/types";
+
+const dates = lastmod as Record<string, string>;
+
+function ogImageFor(title: string, description: string): string {
+  const params = new URLSearchParams({
+    title,
+    description,
+    type: "docs",
+  });
+  return `/api/og?${params.toString()}`;
+}
 
 export default async function Page({ params }: DocsPageProps) {
   const resolvedParams = await params;
@@ -15,9 +28,70 @@ export default async function Page({ params }: DocsPageProps) {
   if (!page) notFound();
 
   const MDXContent = page.data.body;
+  const slug = page.url.replace(/^\/docs\/?/, "");
+  const modified = dates[slug];
+
+  // Structured data for each documentation page. Without it the only machine
+  // readable description of this site was a single SoftwareApplication block on
+  // the landing page, so a search engine or an assistant had nothing telling it
+  // what an individual page covered or where it sat in the hierarchy.
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": `${absoluteUrl(page.url)}#article`,
+        headline: page.data.title,
+        description: page.data.description,
+        url: absoluteUrl(page.url),
+        inLanguage: "en",
+        isPartOf: {
+          "@type": "WebSite",
+          name: `${siteConfig.name} Documentation`,
+          url: absoluteUrl(siteConfig.docsPath),
+        },
+        about: {
+          "@type": "SoftwareApplication",
+          name: siteConfig.name,
+          applicationCategory: "UtilitiesApplication",
+        },
+        author: { "@type": "Organization", name: siteConfig.name, url: siteConfig.github },
+        publisher: { "@type": "Organization", name: siteConfig.name, url: siteConfig.github },
+        license: `${siteConfig.github}/deploy/blob/main/LICENSE`,
+        ...(modified ? { dateModified: modified } : {}),
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${absoluteUrl(page.url)}#breadcrumbs`,
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: siteConfig.name, item: absoluteUrl("/") },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Documentation",
+            item: absoluteUrl(siteConfig.docsPath),
+          },
+          ...(slug
+            ? [
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: page.data.title,
+                  item: absoluteUrl(page.url),
+                },
+              ]
+            : []),
+        ],
+      },
+    ],
+  };
 
   return (
     <DocsPage toc={page.data.toc}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
@@ -38,19 +112,22 @@ export async function generateMetadata({
   const page = source.getPage(resolvedParams.slug);
   if (!page) notFound();
 
+  const description = page.data.description ?? siteConfig.description;
+
   return {
     title: page.data.title,
-    description: page.data.description,
+    description,
     alternates: {
-      canonical: `https://tc.gitnasr.com${page.url}`,
+      canonical: absoluteUrl(page.url),
     },
     openGraph: {
+      type: "article",
       title: page.data.title,
-      description: page.data.description,
-      url: `https://tc.gitnasr.com${page.url}`,
+      description,
+      url: absoluteUrl(page.url),
       images: [
         {
-          url: `/api/og?title=${encodeURIComponent(page.data.title)}&description=${encodeURIComponent(page.data.description ?? "")}&type=docs`,
+          url: ogImageFor(page.data.title, description),
           width: 1200,
           height: 630,
           alt: page.data.title,

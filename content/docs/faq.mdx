@@ -21,12 +21,11 @@ Yes. TorrenClou is fully self-hosted. Your torrent files, download data, and clo
 ## How do I update to a new version?
 
 ```bash
-docker pull ghcr.io/torrenclou/torrentclou:latest
-docker stop torrencloud && docker rm torrencloud
-./run.sh
+curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash
 ```
 
-Your data persists in Docker volumes and survives container re-creation.
+Your data persists in Docker volumes and survives container re-creation. See
+[Updating](/docs/updating) for backups and rollbacks.
 
 ## Can multiple users share one instance?
 
@@ -38,7 +37,7 @@ Failed jobs can be retried from the dashboard. The job queue (Hangfire + Redis) 
 
 ## Can I access TorrenClou remotely?
 
-Yes. Expose ports 47100 and 47200, set `NEXTAUTH_URL` to your public URL, and access from any browser. For production, place a reverse proxy (nginx, Caddy) in front and terminate TLS there.
+Yes. **Expose only port 47100** — the browser reaches the API through the frontend's same-origin proxy, so 47200 does not need to be open, and it carries an unauthenticated Hangfire dashboard. Put a reverse proxy in front and terminate TLS there. Read [Security](/docs/security) before exposing an instance to the internet.
 
 ## Where are downloaded files stored?
 

@@ -1,0 +1,1 @@
+Self-hosted torrent-to-cloud. Download torrents on your server and upload them straight to Google Drive or any S3-compatible storage.

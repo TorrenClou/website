@@ -1,0 +1,1 @@
+irm https://raw.githubusercontent.com/TorrenClou/deploy/main/install.ps1 | iex
