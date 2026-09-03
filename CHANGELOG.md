@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/TorrenClou/website/compare/v0.1.2...v0.1.3) (2026-09-03)
+
+
+### Documentation
+
+* render the configuration reference from the generated schema ([#10](https://github.com/TorrenClou/website/issues/10)) ([1d6ba70](https://github.com/TorrenClou/website/commit/1d6ba703a96d663ac6e119337721a0cb5d90b07b))
+
 ## [0.1.2](https://github.com/TorrenClou/website/compare/v0.1.1...v0.1.2) (2026-09-03)
 
 
