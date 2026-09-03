@@ -1,0 +1,76 @@
+---
+title: Deploying on a PaaS
+description: Run TorrenClou on Dokploy, Coolify, Railway or Render — and the one setting that decides whether your data survives.
+---
+
+TorrenClou runs on any platform that can run a container and attach a disk.
+
+| Platform | Guide |
+|----------|-------|
+| Dokploy | [Dokploy](/docs/paas/dokploy) |
+| Coolify | [Coolify](/docs/paas/coolify) |
+| Railway | [Railway](/docs/paas/railway) |
+| Render | [Render](/docs/paas/render) |
+
+Not using a platform? [Getting started](/docs/getting-started) covers the
+one-line installer, which is simpler than all of these.
+
+## Attach a volume at `/data`, or lose everything on the next deploy
+
+This is the only thing you have to get right.
+
+| Path | Contents |
+|------|----------|
+| `/data/postgres` | The database **and** the secrets generated on first boot |
+| `/data/redis` | Job state |
+| `/data/downloads` | In-flight downloads |
+
+Without a volume mounted at `/data`, every deploy starts a fresh database and
+regenerates the signing keys. Every account and every storage connection is
+gone, and **nothing warns you** — from the container's point of view it is
+simply booting for the first time again. You will see the setup wizard and
+assume something reset itself.
+
+Mount **one** volume at `/data`. Not three, and not one per subdirectory.
+
+## Why one container rather than one service per component
+
+The obvious way to deploy this on a PaaS is a service each for the web app, the
+API and the three workers, with managed PostgreSQL and Redis. It does not work,
+and the reason is easy to miss until uploads start failing.
+
+**The three workers share a filesystem.** The torrent worker downloads into
+`/data/downloads`, and the Google Drive and S3 workers read those files back to
+upload them. On Railway and Render a disk attaches to exactly one service, so
+split across services the upload workers cannot see what the torrent worker
+produced. Downloads succeed, uploads fail, and the error looks like a storage
+problem rather than a topology one.
+
+Neither platform offers a shared filesystem to work around it.
+
+Running everything in one container with a single disk at `/data` avoids the
+problem entirely, and persists the database, Redis and the generated secrets at
+the same time. The usual argument against an all-in-one image on a PaaS — that
+the filesystem is ephemeral, so the bundled database dies on redeploy — stops
+applying the moment there is a disk.
+
+If you genuinely want split services, do it on your own Docker host, where a
+named volume **can** be shared between containers:
+[`compose/docker-compose.split.yml`](https://github.com/TorrenClou/deploy/blob/main/compose/docker-compose.split.yml).
+
+## Sizing
+
+Nine processes and a PostgreSQL server. **At least 2 GB of memory.** On less it
+is killed partway through starting, usually while PostgreSQL initialises, and
+the platform reports it as a crash loop with no obvious cause.
+
+## Pinning a version
+
+Every blueprint defaults to `latest` and honours `TORRENCLOU_VERSION`:
+
+```
+TORRENCLOU_VERSION=1.1.0
+```
+
+Read [Updating](/docs/updating) before rolling back — an older image refuses to
+start against a newer database schema, deliberately.

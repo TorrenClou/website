@@ -1,0 +1,43 @@
+---
+title: Dokploy
+description: Deploy TorrenClou on Dokploy as a Compose service behind Traefik.
+---
+
+Dokploy fronts services with Traefik, so nothing is published on the host and
+the domain is attached in Dokploy rather than in the compose file.
+
+## Steps
+
+1. **Create Project → Compose**.
+2. Point it at the repository `https://github.com/TorrenClou/deploy`, branch
+   `main`, compose path `paas/dokploy/docker-compose.yml`.
+3. **Deploy.** The first boot takes a couple of minutes — PostgreSQL initialises
+   and the app generates its secrets.
+4. **Domains → Add Domain**, container port **47100**, and enable HTTPS.
+5. Open the domain and [create your account](/docs/first-run).
+
+## Volumes
+
+The compose file declares three named volumes. Dokploy prefixes them with the
+project name, which is what you want: two TorrenClou projects on the same host
+stay separate.
+
+Back up the `torrencloud-pgdata` volume before upgrades — it holds the database
+*and* the generated secrets. See [Updating](/docs/updating).
+
+## Only 47100 is routed
+
+The compose file publishes nothing and exposes only 47100. That is deliberate:
+port 47200 serves an unauthenticated Hangfire dashboard, and the browser never
+needs it — the frontend proxies API calls same-origin. See
+[Security](/docs/security).
+
+## If the OAuth callback comes back to the wrong address
+
+Traefik normally forwards the original host and the app works it out. If it does
+not, set these in Dokploy's environment settings:
+
+```
+PUBLIC_FRONTEND_URL=https://torrents.example.com
+NEXTAUTH_URL=https://torrents.example.com
+```

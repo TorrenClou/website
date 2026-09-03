@@ -51,7 +51,11 @@ function navOrder(): string[] {
     if (existsSync(childMeta)) {
       const child = JSON.parse(readFileSync(childMeta, "utf8")) as { pages?: string[] };
       for (const sub of child.pages ?? []) {
-        if (!sub.startsWith("---")) order.push(`${entry}/${sub}`);
+        if (sub.startsWith("---")) continue;
+        // A folder's index page has the slug of the folder itself
+        // ("paas/index.mdx" -> "paas"), so pushing "paas/index" here would
+        // never match and the page would sort to the end of the list.
+        order.push(sub === "index" ? entry : `${entry}/${sub}`);
       }
     } else {
       order.push(entry === "index" ? "" : entry);
