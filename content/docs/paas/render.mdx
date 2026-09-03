@@ -1,0 +1,43 @@
+---
+title: Render
+description: Deploy TorrenClou on Render with a Blueprint and a persistent disk.
+---
+
+## Steps
+
+1. **New → Blueprint**, and point it at `https://github.com/TorrenClou/deploy`.
+   Render reads [`paas/render/render.yaml`](https://github.com/TorrenClou/deploy/blob/main/paas/render/render.yaml).
+2. Apply. Render creates one web service with a 20 GB disk mounted at `/data`.
+3. Open the service URL and [create your account](/docs/first-run).
+
+## Why the Blueprint has one service, not six
+
+Render's own docs push you toward a service per component with a managed
+PostgreSQL and Key Value instance. That shape does not work here.
+
+**A Render disk attaches to exactly one service.** The torrent worker downloads
+into `/data/downloads` and the Drive and S3 workers read those files back to
+upload them. Split into separate services, the upload workers cannot see the
+files, so downloads succeed and every upload fails — and the error reads like a
+storage credentials problem rather than a deployment one.
+
+One service with one disk at `/data` avoids it, and persists the database, Redis
+and the first-boot secrets at the same time.
+
+## The plan matters
+
+The Blueprint specifies `standard`, not `starter`. Nine processes plus a
+PostgreSQL server do not fit in 512 MB — it is OOM-killed partway through
+starting, usually while PostgreSQL initialises.
+
+`numInstances` is pinned to 1. The disk can only be held by one instance, and
+running two copies of the embedded PostgreSQL against one data directory would
+corrupt it.
+
+## Managed Postgres instead
+
+If you would rather use Render's managed PostgreSQL, you are past what the
+Blueprint covers. You would keep the all-in-one image for the workers' shared
+disk and point it at the external database with
+`ConnectionStrings__DefaultConnection`. The bundled PostgreSQL keeps running
+unless you also disable it, so this is not a supported configuration today.

@@ -1,0 +1,38 @@
+---
+title: Coolify
+description: Deploy TorrenClou on Coolify using its magic domain variables.
+---
+
+Coolify generates the domain and injects it, so there is nothing to configure by
+hand.
+
+## Steps
+
+1. **New Resource → Docker Compose**.
+2. Source: `https://github.com/TorrenClou/deploy`, branch `main`, compose path
+   `paas/coolify/docker-compose.yml`.
+3. **Deploy.** First boot takes a couple of minutes.
+4. Coolify assigns a domain from `SERVICE_FQDN_TORRENCLOU_47100` and routes it to
+   port 47100. Open it and [create your account](/docs/first-run).
+
+## The magic variables
+
+```yaml
+environment:
+  - SERVICE_FQDN_TORRENCLOU_47100
+  - PUBLIC_FRONTEND_URL=${SERVICE_FQDN_TORRENCLOU}
+  - NEXTAUTH_URL=${SERVICE_FQDN_TORRENCLOU}
+```
+
+The first tells Coolify to generate a domain and route it to container port
+47100. The other two hand that domain back to the app, so the Google Drive OAuth
+callback returns to the right place. Without them the app still works, but the
+callback can land on an internal hostname.
+
+To use your own domain instead, set it in Coolify's UI; the variables follow.
+
+## Persistence
+
+The three named volumes are managed by Coolify and survive redeploys. The one
+that matters is `torrencloud-pgdata` — it holds the database and the generated
+secrets. See [Updating](/docs/updating) for backups.

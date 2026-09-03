@@ -1,0 +1,56 @@
+---
+title: Railway
+description: Deploy TorrenClou on Railway, and why the volume is not optional.
+---
+
+## Honest scope
+
+Railway's one-click path is a **Template**, defined in Railway's own dashboard
+and published to their marketplace — not a file in a repository. There is a
+`railway.json` in the deploy repo, and it configures a service that already
+exists, but it is not a deploy button. A published Template is planned; until
+then this is a five-minute manual setup.
+
+## Steps
+
+1. **New Project → Docker Image**, and use the prebuilt image:
+
+   ```
+   ghcr.io/torrenclou/torrentclou:latest
+   ```
+
+   Deploying from the repo instead works, but Railway then compiles the .NET
+   backend and the Next.js frontend from source, which is slow.
+
+2. **Add a Volume**, mount path `/data`, **20 GB or more**.
+3. **Settings → Networking → Generate Domain**, target port **47100**.
+4. Open the domain and [create your account](/docs/first-run).
+
+## The volume is the whole thing
+
+Mount it at `/data` — one volume, not three.
+
+Everything that must survive a redeploy lives beneath it: the database, the job
+state, the in-flight downloads, and the secrets generated on first boot. Without
+it, every deploy is a brand new install with a new signing key, so every account
+and storage connection is gone. Nothing tells you; you just get the setup wizard
+again.
+
+It is one volume rather than three because the three workers share
+`/data/downloads` — the torrent worker writes finished files there and the Drive
+and S3 workers read them back. See [the topology note](/docs/paas#why-one-container-rather-than-one-service-per-component).
+
+## Sizing
+
+At least 2 GB of memory. On less it is killed while PostgreSQL initialises, and
+Railway reports a crash loop with no obvious cause.
+
+## If the domain does not reach the app
+
+Railway's proxy normally forwards enough for the app to work out its own address.
+If the Google Drive callback returns to the wrong host, set:
+
+```
+PUBLIC_FRONTEND_URL=https://your-app.up.railway.app
+NEXTAUTH_URL=https://your-app.up.railway.app
+```
