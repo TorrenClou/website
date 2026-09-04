@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedBy": "TorreClou.Core.Configuration.ConfigSchema",
-  "productVersion": "1.1.1",
+  "generatedBy": "TorrenClou.Core.Configuration.ConfigSchema",
+  "productVersion": "2.0.1",
   "entries": [
     {
       "envName": "JWT_SECRET",
