@@ -20,10 +20,9 @@ async function loadFont(
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
-  const title = searchParams.get("title") ?? "TorrenClou";
+  const title = searchParams.get("title") ?? siteConfig.name;
   const description =
-    searchParams.get("description") ??
-    "You're One Command Away from Having Your Torrent to Your Cloud";
+    searchParams.get("description") ?? siteConfig.tagline;
   const type = (searchParams.get("type") as OgImageType) ?? "landing";
 
   const [fontRegular, fontBold, fontExtraBold] = await Promise.all([
@@ -94,13 +93,15 @@ export async function GET(request: NextRequest) {
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 22,
+              fontSize: 20,
+              fontWeight: 800,
+              color: "#ffffff",
             }}
           >
-            ☁
+            TD
           </div>
           <span style={{ fontSize: 24, fontWeight: 700, color: "#ffffff" }}>
-            TorrenClou
+            {siteConfig.name}
           </span>
           {type === "docs" && (
             <span
@@ -166,15 +167,15 @@ export async function GET(request: NextRequest) {
         >
           <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
             <span style={{ fontSize: 15, fontWeight: 600, color: "#3c9483" }}>
-              Self-hosted
+              ISP-Blind
             </span>
-            <span style={{ color: "#30363d", fontSize: 18 }}>•</span>
+            <span style={{ color: "#30363d", fontSize: 18 }}>·</span>
             <span style={{ fontSize: 15, fontWeight: 600, color: "#3c9483" }}>
-              Open Source
+              Self-Hosted
             </span>
-            <span style={{ color: "#30363d", fontSize: 18 }}>•</span>
+            <span style={{ color: "#30363d", fontSize: 18 }}>·</span>
             <span style={{ fontSize: 15, fontWeight: 600, color: "#3c9483" }}>
-              Free Forever
+              Google Drive &amp; S3
             </span>
           </div>
           <span style={{ fontSize: 14, color: "#484f58", fontWeight: 400 }}>

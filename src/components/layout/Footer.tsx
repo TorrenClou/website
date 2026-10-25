@@ -4,8 +4,8 @@ import { ExternalLink, Heart } from "lucide-react";
 
 const FOOTER_LINKS = [
   { label: "Docs", href: "/docs" },
-  { label: "GitHub", href: "https://github.com/TorrenClou", external: true },
-  { label: "License", href: "https://github.com/TorrenClou/deploy/blob/main/LICENSE", external: true },
+  { label: "GitHub", href: "https://github.com/TorrentDrive", external: true },
+  { label: "License", href: "https://github.com/TorrentDrive/deploy/blob/main/LICENSE", external: true },
 ];
 
 export function Footer() {
@@ -13,7 +13,7 @@ export function Footer() {
     <footer className="border-t border-surface-300/20">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-6 py-10 sm:flex-row">
         <div className="flex items-center gap-2.5">
-          <Image src="/logo.svg" alt="TorrenClou" width={24} height={24} />
+          <Image src="/logo.svg" alt="TorrentDrive" width={24} height={24} />
           <span className="text-sm text-surface-100">
             Open source torrent-to-cloud sync.
           </span>

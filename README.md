@@ -1,17 +1,17 @@
-# TorrenClou Website
+# TorrentDrive Website
 
 The marketing site and — more importantly — **the canonical documentation** for
-[TorrenClou](https://tc.gitnasr.com), self-hosted torrent-to-cloud.
+[TorrentDrive](https://tc.gitnasr.com), self-hosted torrent-to-cloud.
 
 Live at **[tc.gitnasr.com](https://tc.gitnasr.com)**.
 
 ## Docs live here, and only here
 
-Every fact about installing, configuring or operating TorrenClou belongs in
+Every fact about installing, configuring or operating TorrentDrive belongs in
 `content/docs/`. The READMEs in
-[backend](https://github.com/TorrenClou/backend),
-[frontend](https://github.com/TorrenClou/frontend) and
-[deploy](https://github.com/TorrenClou/deploy) link here rather than restating
+[backend](https://github.com/TorrentDrive/backend),
+[frontend](https://github.com/TorrentDrive/frontend) and
+[deploy](https://github.com/TorrentDrive/deploy) link here rather than restating
 anything, because for a long time they each kept their own copy and the copies
 disagreed with each other and with the code.
 
@@ -35,7 +35,7 @@ generated from `content/docs`; `src/lib/source.ts` is the loader.
 ## Developing
 
 ```bash
-git clone https://github.com/TorrenClou/website.git
+git clone https://github.com/TorrentDrive/website.git
 cd website
 npm install
 npm run dev
@@ -55,10 +55,10 @@ the OG image all follow from those two steps.
 
 | Repository | Contents |
 |------------|----------|
-| [backend](https://github.com/TorrenClou/backend) | .NET 9 API and workers |
-| [frontend](https://github.com/TorrenClou/frontend) | Next.js web app |
-| [deploy](https://github.com/TorrenClou/deploy) | All-in-one image, installer, CI |
+| [backend](https://github.com/TorrentDrive/backend) | .NET 9 API and workers |
+| [frontend](https://github.com/TorrentDrive/frontend) | Next.js web app |
+| [deploy](https://github.com/TorrentDrive/deploy) | All-in-one image, installer, CI |
 
 ## License
 
-MIT — see [LICENSE](https://github.com/TorrenClou/website/blob/main/LICENSE).
+MIT — see [LICENSE](https://github.com/TorrentDrive/website/blob/main/LICENSE).

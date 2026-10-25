@@ -1,52 +1,59 @@
 ---
 title: FAQ
-description: Frequently asked technical questions about TorrenClou.
+description: Frequently asked questions about TorrentDrive, ISP-blind torrenting to Google Drive, and self-hosted deployment.
 ---
+
+## Can my home ISP see what I am torrenting?
+
+No. When you deploy TorrentDrive on a remote VPS, Dokploy, or Coolify, your home device never joins a BitTorrent swarm, never opens peer ports, and never sends UDP/HTTP tracker announces. You upload `.torrent` files to your TorrentDrive web UI over standard HTTPS, the remote server downloads the pieces using **MSE/PE RC4 stream encryption**, and finished files are streamed directly to your **Google Drive** or **S3** bucket over official Google/AWS HTTPS APIs.
 
 ## Is my data private?
 
-Yes. TorrenClou is fully self-hosted. Your torrent files, download data, and cloud credentials are stored exclusively inside your Docker container's volumes. No data is transmitted to any third-party service.
+Yes. TorrentDrive is 100% self-hosted. Your torrent files, download data, and cloud OAuth/S3 credentials are stored exclusively inside your Docker container's volumes. No data is ever transmitted to any third-party relay service.
+
+## How does TorrentDrive protect private trackers and prevent VPS flagging?
+
+- **MSE/PE RC4 Encryption**: Prefers RC4 full/header stream encryption (or enforces strict RC4-only mode when `TORRENT_REQUIRE_ENCRYPTION=true`) to defeat DPI signature throttling.
+- **Strict BEP 27 Private Torrent Isolation**: When a `.torrent` file has the private flag (`private=1`), TorrentDrive automatically disables DHT, Peer Exchange (PEX), Local Peer Discovery (LPD), and public tracker injection so passkeys never leak to public swarms.
+- **Zero Cloud VPS Noise**: Disables UPnP/NAT-PMP port forwarding and RFC 1918 local multicast probes that trigger abuse alerts on cloud networks, and supports `TORRENT_BIND_IP` to bind peer traffic to a VPN/WireGuard interface.
 
 ## Which cloud providers are supported?
 
-**Google Drive** via OAuth 2.0 and any **S3-compatible storage** — including AWS S3, Backblaze B2, MinIO, Wasabi, Cloudflare R2, and DigitalOcean Spaces.
+**Google Drive** via OAuth 2.0 and any **S3-compatible storage** — including AWS S3, Cloudflare R2, Backblaze B2, Wasabi, MinIO, and DigitalOcean Spaces.
 
 ## What are the hardware requirements?
 
 - **RAM**: 2 GB minimum, 4 GB recommended
-- **Disk**: 3 GB for the Docker image + space for downloads
-- **CPU**: Any modern 64-bit processor
-- **OS**: Anything that runs Docker (Linux, macOS, Windows with WSL2)
+- **Disk**: 3 GB for the Docker image + temporary buffer space for active downloads
+- **CPU**: Any modern 64-bit processor (`amd64` or `arm64`)
+- **OS**: Anything that runs Docker (Linux, macOS, Windows with WSL2, Dokploy, Coolify)
 
 ## How do I update to a new version?
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.sh | bash
 ```
 
-Your data persists in Docker volumes and survives container re-creation. See
-[Updating](/docs/updating) for backups and rollbacks.
+Or with Docker Compose:
 
-## Can multiple users share one instance?
+```bash
+docker compose pull && docker compose up -d
+```
 
-The current version is designed for single-admin use. Multi-user support with per-user storage configs and job isolation is planned for a future release.
+Your data persists in Docker volumes and survives container re-creation. See [Updating](/docs/updating) for backups and rollbacks.
 
-## What happens if a download fails?
+## What happens if a download or cloud upload fails?
 
-Failed jobs can be retried from the dashboard. The job queue (Hangfire + Redis) survives container restarts and tracks full retry history.
+TorrentDrive continuously probes storage health (`StorageProfileHealthService`) and automatically reroutes uploads to another healthy Google Drive or S3 profile if your primary drive fills up. Failed jobs can also be retried from the dashboard with full multipart checkpoint recovery.
 
-## Can I access TorrenClou remotely?
+## Can I access TorrentDrive remotely?
 
-Yes. **Expose only port 47100** — the browser reaches the API through the frontend's same-origin proxy, so 47200 does not need to be open, and it carries an unauthenticated Hangfire dashboard. Put a reverse proxy in front and terminate TLS there. Read [Security](/docs/security) before exposing an instance to the internet.
+Yes. **Expose only port 47100** — the browser reaches the API through the frontend's same-origin proxy, while internal admin ports (`47200`, `47500`, `47600`) bind to `127.0.0.1` by default. Put a reverse proxy (or Dokploy/Coolify) in front to terminate TLS. Read [Security](/docs/security) before exposing an instance to the internet.
 
 ## Where are downloaded files stored?
 
-Inside the container at `/data/downloads`, mapped to the `torrencloud-downloads` Docker volume. You can mount a local directory instead:
-
-```bash
-docker run ... -v /path/to/local/dir:/data/downloads ...
-```
+Inside the container at `/data/downloads`, mapped to the `torrentdrive-downloads` Docker volume. Once an upload completes, TorrentDrive can automatically delete the local copy (configurable under **Settings → Transfers**) or you can purge local files on demand from the Job Details page.
 
 ## Is there a hosted version?
 
-No. TorrenClou is 100% self-hosted by design. There is no cloud service, no accounts, no subscriptions. You own everything.
+No. TorrentDrive is 100% self-hosted by design. There is no cloud service, no accounts, no subscriptions. You own everything.

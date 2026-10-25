@@ -14,40 +14,40 @@ import type { FeatureCardProps } from "@/types";
 
 const FEATURES: FeatureCardProps[] = [
   {
-    icon: FileDown,
-    title: ".torrent File Downloads",
+    icon: Lock,
+    title: "ISP-Blind Stealth Engine",
     description:
-      "Upload a .torrent file and downloads start immediately in the background.",
+      "Your home IP never joins a BitTorrent swarm. Server-side MSE/PE RC4 encryption, strict BEP 27 private-tracker isolation, and VPN interface binding keep transfers invisible.",
   },
   {
     icon: Cloud,
-    title: "Sync to Google Drive",
+    title: "Direct to Google Drive & S3",
     description:
-      "OAuth 2.0 integration. Completed downloads land in your Drive folder automatically.",
+      "Stream completed downloads straight into Google Drive or S3 over standard HTTPS. Live health probes automatically reroute uploads if a drive fills up.",
+  },
+  {
+    icon: FileDown,
+    title: "Selective Batch Downloads",
+    description:
+      "Drop multiple .torrent files at once, inspect live UDP/HTTP tracker swarm health, and pick only the exact files you want.",
   },
   {
     icon: Database,
-    title: "S3-Compatible Storage",
+    title: "Resumable Cloud Transfers",
     description:
-      "AWS S3, Backblaze B2, MinIO, and any S3-compatible endpoint. Resumable uploads for large files.",
+      "Google Drive, AWS S3, Cloudflare R2, Backblaze B2, Wasabi, and MinIO with checkpointed multipart uploads that survive restarts.",
   },
   {
     icon: Activity,
-    title: "Real-time Progress",
+    title: "Real-Time Telemetry",
     description:
-      "Watch downloads progress live. Job queue survives container restarts.",
-  },
-  {
-    icon: Lock,
-    title: "Self-Hosted & Private",
-    description:
-      "Your data never leaves your server. No telemetry, no phone-home, no accounts.",
+      "Track active downloads, upload speeds, and state transitions in real time with pre-provisioned Grafana & Prometheus dashboards.",
   },
   {
     icon: Box,
-    title: "One Docker Container",
+    title: "One Command or 1-Click PaaS",
     description:
-      "PostgreSQL, Redis, API, workers, and frontend — all in one image.",
+      "PostgreSQL, Redis, API, workers, and UI in one zero-config container. First-class 1-click templates for Dokploy and Coolify.",
   },
 ];
 
@@ -95,7 +95,7 @@ export function FeatureCards() {
             Core Features
           </h2>
           <p className="mt-4 text-surface-50">
-            Everything you need to download torrents and sync them to the cloud.
+            Built for ISP-blind, encrypted, hands-off torrent-to-Google Drive and S3 transfers.
           </p>
         </div>
 

@@ -121,7 +121,7 @@ export function ConfigTable(props: ConfigTableProps) {
 export function ConfigSchemaVersion() {
   return (
     <p className="text-sm opacity-70">
-      Generated from TorrenClou <strong>{data.productVersion}</strong>, describing{" "}
+      Generated from TorrentDrive <strong>{data.productVersion}</strong>, describing{" "}
       {data.entries.length} configuration values.
     </p>
   );

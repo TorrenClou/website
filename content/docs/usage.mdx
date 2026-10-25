@@ -1,80 +1,71 @@
 ---
 title: Usage Guide
-description: How to add torrents, manage jobs, and use cloud storage integrations.
+description: Upload and analyze .torrent batches, pick individual files, manage jobs, and control cloud storage failover.
 ---
 
-## Adding Torrents
+## Adding & Analyzing Torrents
 
-### Upload a .torrent file
+TorrentDrive uses a two-step **Upload & Review** workflow so you can inspect swarm health and select
+individual files before any transfer begins:
 
-1. Navigate to the **Torrents** page from the sidebar
-2. Click **Upload .torrent**
-3. Select your `.torrent` file — the download job starts immediately
+1. Click **Upload Torrent** in the sidebar (`/torrents/upload`).
+2. Drag and drop one or more `.torrent` files (up to 10 MB each).
+3. TorrentDrive parses the `.torrent` metadata and scrapes both **UDP (BEP 15)** and **HTTP/HTTPS (BEP 48)**
+   trackers in parallel to compute a live **Health Score**, seeder count, and leecher count.
+   - If a torrent has the **BEP 27 Private Flag** (`private=1`), TorrentDrive displays a **Private** badge
+     and strictly isolates it to its embedded tracker URLs — never querying public fallback trackers,
+     DHT, PEX, or Local Peer Discovery.
+4. On the **Review Torrents** screen (`/torrents/analyze`):
+   - Expand any torrent in the batch to **select or deselect individual files**. Unselected files are
+     skipped, and shared boundary pieces are isolated in hidden partial files so only your chosen
+     files are uploaded to the cloud.
+   - Choose a **Save to Storage** profile for the entire batch, or override the destination on
+     individual torrents.
+   - If tracker scraping reports `0` seeders on a swarm that actually has peers via DHT/PEX, you can
+     still **Force Start** the transfer.
+5. Click **Start download** (or **Start all N downloads**).
 
-## Monitoring Downloads
+## Monitoring Transfers
 
-The **Dashboard** shows:
+Open **Dashboard** (`/dashboard`) or **Jobs** (`/jobs`) to watch transfers in real time:
 
-- Active jobs with real-time progress bars
-- Download speed and estimated time remaining
-- Upload progress percentage for cloud sync jobs
-- Job status progression: **Queued** → **Downloading** → **Pending Upload** → **Uploading** → **Completed**
+- **Status Progression**: `QUEUED` → `DOWNLOADING` → `PENDING_UPLOAD` → `UPLOADING` → `COMPLETED`
+- **Live Telemetry**: Real-time progress percentage, downloaded bytes, upload progress, and a
+  step-by-step **Job Timeline** recording every state transition and worker source (`Worker`,
+  `User`, `System`, `Recovery`).
 
-## Managing Jobs
+## Managing Destinations, Pinning & Failover
 
-Jobs can be **retried** or **cancelled** from the job detail view. The job queue is powered by Hangfire with Redis as the backing store — it survives container restarts.
+Every job detail page (`/jobs/<id>`) includes a **Destination** card:
 
-Visit the **Hangfire Dashboard** at `http://localhost:47200/hangfire` to see raw queue state, active workers, and retry history.
+- **Switch Drive Mid-Job**: While a job is queued, downloading, or waiting to upload, you can move
+  it to any other healthy storage profile using **Send to another drive**.
+- **Automatic Failover**: By default, if a destination drive runs out of quota, loses authorization,
+  or hits consecutive upload failures (`FailureThreshold`), TorrentDrive automatically reroutes the
+  upload to another healthy storage profile (`FailoverQuotaExceeded`, `FailoverNeedsReauth`,
+  `FailoverUnhealthy`).
+- **Pin to this drive**: Turn on **Pin to this drive** on the Destination card if you want the job
+  to stay on its assigned drive and fail rather than rerouting elsewhere.
 
-## Configuring Cloud Storage
+## Local Disk Cleanup & Purge
 
-Cloud storage is managed under **Storage** in the sidebar:
+Under **Settings** (`/dashboard/settings`):
 
-- [Google Drive Setup](/docs/providers/google-drive)
-- [AWS S3 Setup](/docs/providers/s3)
-- [S3-Compatible (Backblaze B2, MinIO)](/docs/providers/s3-compatible)
+- **Delete downloads after a successful upload**: Enabled by default. Deletes `/data/downloads/<jobId>`
+  as soon as every selected file is confirmed in your cloud storage.
+- **Local Storage & Purge**: Scans `/data/downloads` and breaks usage down into **Can be freed**
+  (completed or cancelled jobs), **In use** (active or retrying jobs), and **Unrecognised**
+  directories. Click **Purge** to reclaim disk space from completed or cancelled jobs at any time.
 
-## Common Operations
-
-### View logs
-
-```bash
-docker logs -f torrencloud
-```
-
-### Stop the application
-
-```bash
-docker stop torrencloud
-```
-
-### Start again (data persists)
-
-```bash
-docker start torrencloud
-```
-
-### Access downloaded files
-
-```bash
-docker exec -it torrencloud ls /data/downloads
-```
-
-Or mount a local directory instead of a Docker volume:
+## Common Container Operations
 
 ```bash
-docker run -d --name torrencloud \
-  -p 47100:47100 -p 47200:47200 \
-  -v torrencloud-pgdata:/data/postgres \
-  -v torrencloud-redis:/data/redis \
-  -v /path/to/your/downloads:/data/downloads \
-  ghcr.io/torrenclou/torrentclou:latest
+# Follow live container logs
+docker logs -f torrentdrive
+
+# Check all 9 internal supervisord processes
+docker exec torrentdrive supervisorctl status
+
+# Restart the container (all data & queued jobs persist)
+docker restart torrentdrive
 ```
-
-## Updating
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash
-```
-
-Data persists in Docker volumes across container re-creations.

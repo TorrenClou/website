@@ -8,15 +8,19 @@ import { Button } from "@/components/ui/Button";
 import { CodeBlock } from "@/components/ui/CodeBlock";
 import { ExternalLink } from "lucide-react";
 
-type Platform = "linux" | "windows";
+type Platform = "linux" | "compose" | "windows";
 
 const INSTALL_COMMANDS: Record<Platform, { code: string; filename: string }> = {
   linux: {
-    code: "curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash",
+    code: "curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.sh | bash",
     filename: "terminal",
   },
+  compose: {
+    code: "curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/docker-compose.yml -o docker-compose.yml && docker compose up -d",
+    filename: "docker-compose",
+  },
   windows: {
-    code: "irm https://raw.githubusercontent.com/TorrenClou/deploy/main/install.ps1 | iex",
+    code: "irm https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.ps1 | iex",
     filename: "powershell",
   },
 };
@@ -50,7 +54,7 @@ export function HeroSection() {
       >
         <motion.div variants={fadeUpVariant}>
           <Badge variant="outline" className="mb-6">
-            Requires Docker
+            ISP-Blind Architecture · One Container · Dokploy &amp; Coolify Ready
           </Badge>
         </motion.div>
 
@@ -58,17 +62,18 @@ export function HeroSection() {
           variants={fadeUpVariant}
           className="text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl"
         >
-          You&apos;re One Command Away from Having Your Torrent to Your{" "}
+          Torrent to{" "}
           <span className="bg-gradient-to-r from-primary-400 to-primary-200 bg-clip-text text-transparent">
-            Cloud
-          </span>
+            Google Drive
+          </span>{" "}
+          Without Your ISP Knowing
         </motion.h1>
 
         <motion.p
           variants={fadeUpVariant}
           className="mt-6 text-lg text-surface-50 md:text-xl"
         >
-          No Questions Asked. No Traces.
+          Zero local P2P traffic. Your remote TorrentDrive instance handles encrypted BitTorrent swarms and streams finished files straight into your Google Drive or S3 — your home ISP only ever sees standard HTTPS.
         </motion.p>
 
         <motion.div
@@ -79,7 +84,7 @@ export function HeroSection() {
             Get Started
           </Button>
           <Button
-            href="https://github.com/TorrenClou"
+            href="https://github.com/TorrentDrive"
             external
             variant="outline"
             size="lg"
@@ -90,7 +95,7 @@ export function HeroSection() {
         </motion.div>
 
         <motion.div variants={fadeUpVariant} className="mt-12">
-          <div className="mb-3 flex items-center justify-center gap-2">
+          <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
             <button
               onClick={() => setPlatform("linux")}
               className={`cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-colors ${
@@ -100,6 +105,16 @@ export function HeroSection() {
               }`}
             >
               Linux / macOS
+            </button>
+            <button
+              onClick={() => setPlatform("compose")}
+              className={`cursor-pointer rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                platform === "compose"
+                  ? "bg-primary-500/20 text-primary-400"
+                  : "text-surface-100 hover:text-white"
+              }`}
+            >
+              Docker Compose
             </button>
             <button
               onClick={() => setPlatform("windows")}
@@ -114,12 +129,18 @@ export function HeroSection() {
           </div>
           <CodeBlock code={cmd.code} filename={cmd.filename} />
           <p className="mt-4 font-mono text-xs text-surface-100">
-            After install →{" "}
-            <span className="text-primary-400">localhost:47100</span>{" "}
-            <span className="text-surface-200">(admin@torrencloud.local)</span>
+            First boot opens the{" "}
+            <span className="text-primary-400">Setup Wizard</span> at{" "}
+            <span className="text-surface-200">localhost:47100</span>
             {" · "}
-            <span className="text-primary-400">Grafana :47500</span>{" "}
-            <span className="text-surface-200">(admin/admin)</span>
+            Deploy in 1 click on{" "}
+            <a href="/docs/paas/dokploy" className="text-primary-400 hover:underline">
+              Dokploy
+            </a>{" "}
+            or{" "}
+            <a href="/docs/paas/coolify" className="text-primary-400 hover:underline">
+              Coolify
+            </a>
           </p>
         </motion.div>
       </motion.div>

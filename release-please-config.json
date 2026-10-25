@@ -4,7 +4,7 @@
   "bootstrap-sha": "647574f7ee6afe110029de66f67e12a54c7570c5",
   "packages": {
     ".": {
-      "package-name": "torrenclou-website",
+      "package-name": "torrentdrive-website",
       "changelog-path": "CHANGELOG.md",
       "include-component-in-tag": false,
       "changelog-sections": [

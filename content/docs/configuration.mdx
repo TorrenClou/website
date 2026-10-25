@@ -63,7 +63,7 @@ two copies agreed.
 ### Required by the application
 
 These have no built-in default. The all-in-one image generates both on first boot and keeps them
-on the `torrencloud-pgdata` volume, which is why you never set them by hand — but a split
+on the `torrentdrive-pgdata` volume, which is why you never set them by hand — but a split
 deployment, where nothing generates them, must supply them.
 
 <ConfigTable filter="required" />
@@ -97,8 +97,8 @@ So once you save a worker count in the app, `HANGFIRE_WORKER_COUNT` no longer ha
 You do not need one. If you would rather keep overrides in a file:
 
 ```bash
-docker run -d --env-file .env ... ghcr.io/torrenclou/torrentclou:latest
+docker run -d --env-file .env ... ghcr.io/torrentdrive/torrentdrive:latest
 ```
 
-[`.env.example`](https://github.com/TorrenClou/deploy/blob/main/.env.example) lists the available
+[`.env.example`](https://github.com/TorrentDrive/deploy/blob/main/.env.example) lists the available
 overrides, all commented out.

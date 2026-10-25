@@ -3,7 +3,7 @@ title: Security
 description: Where secrets live, what each port exposes, and what to do before putting an instance on the internet.
 ---
 
-TorrenClou is built for a single owner running it on their own server. That assumption shapes
+TorrentDrive is built for a single owner running it on their own server. That assumption shapes
 everything below — read it before putting one on the public internet.
 
 ## Claim a new install immediately
@@ -20,7 +20,7 @@ firewall afterwards.
 
 ## Where secrets live
 
-`/data/postgres/secrets.env`, on the `torrencloud-pgdata` volume, mode 600:
+`/data/postgres/secrets.env`, on the `torrentdrive-pgdata` volume, mode 600:
 
 | Value | Used for |
 |-------|----------|
@@ -32,7 +32,7 @@ firewall afterwards.
 Read them with:
 
 ```bash
-docker exec torrencloud cat /data/postgres/secrets.env
+docker exec torrentdrive cat /data/postgres/secrets.env
 ```
 
 Anyone with the volume, or root on the host, has all of these. That is the same trust boundary
@@ -109,4 +109,4 @@ container on a host that is already behind one.
 
 Please do not open a public issue. Use GitHub's private vulnerability reporting on the affected
 repository — its **Security** tab, then **Report a vulnerability**. The full policy is in
-[SECURITY.md](https://github.com/TorrenClou/.github/blob/main/SECURITY.md).
+[SECURITY.md](https://github.com/TorrentDrive/.github/blob/main/SECURITY.md).

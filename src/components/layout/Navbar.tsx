@@ -11,7 +11,7 @@ import type { NavItem } from "@/types";
 
 const NAV_ITEMS: NavItem[] = [
   { label: "Docs", href: "/docs" },
-  { label: "GitHub", href: "https://github.com/TorrenClou", external: true },
+  { label: "GitHub", href: "https://github.com/TorrentDrive", external: true },
 ];
 
 export function Navbar() {
@@ -28,8 +28,8 @@ export function Navbar() {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-2.5">
-          <Image src="/logo.svg" alt="TorrenClou" width={28} height={28} />
-          <span className="text-lg font-bold text-white">TorrenClou</span>
+          <Image src="/logo.svg" alt="TorrentDrive" width={28} height={28} />
+          <span className="text-lg font-bold text-white">TorrentDrive</span>
         </Link>
 
         <div className="flex items-center gap-6">

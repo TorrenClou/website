@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "generatedBy": "TorreClou.Core.Configuration.ConfigSchema",
-  "productVersion": "1.1.1",
+  "generatedBy": "TorrentDrive.Core.Configuration.ConfigSchema",
+  "productVersion": "2.0.1",
   "entries": [
     {
       "envName": "JWT_SECRET",
@@ -16,7 +16,7 @@
       "envName": "POSTGRES_PASSWORD",
       "configKey": "ConnectionStrings:DefaultConnection",
       "description": "Assembled by the entrypoint from POSTGRES_DB, POSTGRES_USER and POSTGRES_PASSWORD.",
-      "default": "password generated on first run; database torrenclo, user torrenclo_user",
+      "default": "password generated on first run; database torrentdrive, user torrentdrive_user",
       "type": "string",
       "secret": true,
       "required": true
@@ -35,7 +35,7 @@
       "envName": "ADMIN_NAME",
       "configKey": "Name",
       "description": "Display name for the legacy admin account.",
-      "default": "TorrenClou Admin",
+      "default": "TorrentDrive Admin",
       "type": "string",
       "secret": false,
       "required": false,
@@ -100,7 +100,7 @@
       "envName": "JWT_AUDIENCE",
       "configKey": "Jwt:Audience",
       "description": "Audience claim written into tokens and checked on validation.",
-      "default": "TorrenClou_Client",
+      "default": "TorrentDrive_Client",
       "type": "string",
       "secret": false,
       "required": false
@@ -109,7 +109,7 @@
       "envName": "JWT_ISSUER",
       "configKey": "Jwt:Issuer",
       "description": "Issuer claim written into tokens and checked on validation.",
-      "default": "TorrenClou_API",
+      "default": "TorrentDrive_API",
       "type": "string",
       "secret": false,
       "required": false

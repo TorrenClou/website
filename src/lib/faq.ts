@@ -12,9 +12,14 @@ import type { FaqItem } from "@/types";
  */
 export const FAQ_ITEMS: FaqItem[] = [
   {
+    question: "Can my home ISP see what I am torrenting?",
+    answer:
+      "No. When you deploy TorrentDrive on a cloud VPS, Dokploy, or Coolify, your home connection never joins a BitTorrent swarm or talks to trackers. You upload the .torrent file over HTTPS to your TorrentDrive dashboard, the remote server downloads it with MSE/PE RC4 stream encryption, and the finished files are pushed directly to your Google Drive or S3 over Google/AWS HTTPS APIs.",
+  },
+  {
     question: "Is my data private?",
     answer:
-      "Yes. TorrenClou is 100% self-hosted. Your torrent files, downloads, and cloud credentials are stored exclusively inside your Docker container. No data is ever sent to any external service.",
+      "Yes. TorrentDrive is 100% self-hosted. Your torrent files, downloads, and cloud credentials are stored exclusively inside your Docker container. No data is ever sent to any third-party relay.",
   },
   {
     question: "Which cloud providers are supported?",
@@ -24,31 +29,26 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: "What hardware do I need?",
     answer:
-      "Minimum 2 GB RAM, 3 GB disk space for the Docker image, and any modern 64-bit processor. Runs on anything that supports Docker — Linux, macOS, or Windows with WSL2.",
+      "Minimum 2 GB RAM, 3 GB disk space for the Docker image, and any modern 64-bit processor. Runs on anything that supports Docker — a $4 cloud VPS, Dokploy, Coolify, Linux, macOS, or Windows with WSL2.",
   },
   {
     question: "How do I update to a new version?",
     answer:
-      "Re-run the installer. It replaces the container and leaves the volumes alone, so your database, downloads and generated secrets survive.",
+      "Re-run the installer or pull the latest Docker Compose image. It replaces the container and leaves the volumes alone, so your database, downloads, and generated secrets survive.",
   },
   {
-    question: "Can multiple users share one instance?",
+    question: "What happens if a download or upload fails?",
     answer:
-      "Currently designed for single-admin use. Multi-user support with per-user storage configurations and job isolation is planned for a future release.",
+      "TorrentDrive continuously probes storage health and automatically fails over to another healthy drive if your primary storage fills up. Failed jobs can also be retried from the dashboard with full checkpoint recovery.",
   },
   {
-    question: "What happens if a download fails?",
+    question: "Can I access TorrentDrive remotely?",
     answer:
-      "Failed jobs can be retried from the dashboard. The job queue is powered by Hangfire and Redis — it survives container restarts and tracks retry history.",
-  },
-  {
-    question: "Can I access TorrenClou remotely?",
-    answer:
-      "Yes. Expose only port 47100 and put a reverse proxy with TLS in front of it. Port 47200 does not need to be open — the browser reaches the API through the frontend's same-origin proxy, and 47200 carries an unauthenticated Hangfire dashboard.",
+      "Yes. Expose only port 47100 and put a reverse proxy with TLS in front of it (or deploy with 1 click on Dokploy or Coolify). Internal admin ports (47200, 47500, 47600) are bound to 127.0.0.1 by default.",
   },
   {
     question: "Is there a hosted version?",
     answer:
-      "No. TorrenClou is self-hosted by design. There is no cloud service, no accounts, no subscriptions. You own everything.",
+      "No. TorrentDrive is self-hosted by design. There is no cloud service, no accounts, no subscriptions. You own everything.",
   },
 ];

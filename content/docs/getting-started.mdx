@@ -1,93 +1,87 @@
 ---
 title: Getting Started
-description: Install TorrenClou with one command, then reach it, put it behind a proxy, or point it at a bigger disk.
+description: Install TorrentDrive with one command, Docker Compose, or a 1-click PaaS template.
 ---
 
 ## Requirements
 
-- Docker, and a machine that can run Linux containers
-- About 2 GB of RAM
-- Enough disk for the torrents you intend to download — they land on a volume before being
-  uploaded, and are deleted afterwards by default
+- Docker (or Docker Compose) on a machine that can run Linux containers
+- At least 2 GB of RAM
+- Enough disk space for the torrents you intend to stage — files land on `/data/downloads` before
+  being uploaded to your cloud storage, and are deleted automatically afterwards by default
 
-Images are built for `linux/amd64` and `linux/arm64`, so an ARM VPS or a Raspberry Pi works.
+Images are published for `linux/amd64` and `linux/arm64`, so an ARM VPS or Raspberry Pi works out of the box.
 
-## The one-liner
+## Option 1: One-Command Installer
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.sh | bash
 ```
 
 Windows, in PowerShell:
 
 ```powershell
-irm https://raw.githubusercontent.com/TorrenClou/deploy/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.ps1 | iex
 ```
 
-It checks Docker is running, pulls the image, starts it, waits for it to become healthy, and
-prints the URL to open. **There is no configuration step** — no `.env` to fill in, no secrets to
-generate. The container creates its own on first boot and keeps them on its data volume.
+It checks that Docker is running, pulls the image, starts the container, waits for `/health/ready`,
+and prints the URL to open. **There is no configuration step** — no `.env` to edit and no secrets to
+generate by hand. The container creates its own secrets on first boot and stores them in
+`/data/postgres/secrets.env`.
 
-Open the URL it prints and [create your account](/docs/first-run).
+Open the URL it prints and [claim your instance](/docs/first-run).
 
-If you would rather read the script before running it — a reasonable habit — it is
-[install.sh](https://github.com/TorrenClou/deploy/blob/main/install.sh), about 90 lines.
+## Option 2: Docker Compose (Zero Config)
 
-## Manual install
+Download the root `docker-compose.yml` and bring it up directly:
 
-The installer runs exactly this:
+```bash
+curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/docker-compose.yml -o docker-compose.yml
+docker compose up -d
+```
+
+## Option 3: 1-Click PaaS Deployment
+
+Deploying on a self-hosted PaaS or managed container platform? Use the dedicated blueprints:
+
+- **[Dokploy](/docs/paas/dokploy)** — includes `template.toml` and `paas/dokploy/docker-compose.yml`
+- **[Coolify](/docs/paas/coolify)** — uses `SERVICE_FQDN_TORRENTDRIVE_47100` magic domain variables
+- **[Render](/docs/paas/render)** — Infrastructure-as-Code `render.yaml` blueprint
+- **[Railway](/docs/paas/railway)** — `railway.json` with persistent `/data` volume
+
+## Manual `docker run`
+
+The installer runs this exact container configuration:
 
 ```bash
 docker run -d \
-    --name torrencloud \
+    --name torrentdrive \
     --restart unless-stopped \
     -p 47100:47100 \
-    -p 47200:47200 \
-    -p 47500:47500 \
-    -p 47600:47600 \
-    -v torrencloud-pgdata:/data/postgres \
-    -v torrencloud-redis:/data/redis \
-    -v torrencloud-downloads:/data/downloads \
-    ghcr.io/torrenclou/torrentclou:latest
+    -p 127.0.0.1:47200:47200 \
+    -p 127.0.0.1:47500:47500 \
+    -p 127.0.0.1:47600:47600 \
+    -v torrentdrive-pgdata:/data/postgres \
+    -v torrentdrive-redis:/data/redis \
+    -v torrentdrive-downloads:/data/downloads \
+    ghcr.io/torrentdrive/torrentdrive:latest
 ```
-
-No `-e` flags and no `--env-file`. The container works out the rest.
-
-If you only want the app, drop the `-p 47500` and `-p 47600` lines — those are Grafana and
-Prometheus, and the app does not need them. See [Security](/docs/security#what-each-port-exposes)
-for why publishing fewer ports is the better default.
 
 ## Ports
 
-| Port | Service |
-|------|---------|
-| 47100 | Web interface |
-| 47200 | API, plus `/hangfire` |
-| 47500 | Grafana |
-| 47600 | Prometheus |
+| Port | Default Bind | Service |
+|------|--------------|---------|
+| 47100 | `0.0.0.0:47100` | Web interface (proxies `/proxy/api/*` same-origin to the API) |
+| 47200 | `127.0.0.1:47200` | REST API, `/metrics`, and `/hangfire` |
+| 47500 | `127.0.0.1:47500` | Grafana dashboards |
+| 47600 | `127.0.0.1:47600` | Prometheus metrics |
 
-**Only 47100 needs to be reachable for normal use.** The browser talks to the API through the
-frontend's same-origin proxy, so 47200 does not need to be open.
+**Only port 47100 needs to be reachable from outside.** Ports `47200`, `47500`, and `47600` are
+bound to `127.0.0.1` by default so administrative dashboards are never exposed on public VPS
+network interfaces. Reach them via SSH port-forwarding (`ssh -L 47500:127.0.0.1:47500 user@server`)
+or an authenticated reverse proxy.
 
-## Reaching it
-
-The installer prints an `sslip.io` address — a public DNS service that resolves
-`203-0-113-5.sslip.io` to `203.0.113.5`. That gives you a working hostname on a fresh server with
-no DNS set up. It is only a convenience for the printed link; the app works on whatever address
-you reach it by.
-
-Open port 47100 in your firewall:
-
-```bash
-sudo ufw allow 47100/tcp
-```
-
-## Custom domain
-
-Point an A record at the server and open the app on it. Nothing to configure — the app derives
-its own address from the request.
-
-## Behind a reverse proxy
+## Behind a Reverse Proxy
 
 A minimal nginx server block:
 
@@ -105,39 +99,18 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
 
-        # Large uploads and long-lived progress streams
         client_max_body_size 100M;
         proxy_read_timeout   3600s;
     }
 }
 ```
 
-The `X-Forwarded-Host` and `X-Forwarded-Proto` headers matter: the app uses them to work out its
-own public address, which is what the Google Drive OAuth callback returns to. If your proxy
-cannot send them, set the address explicitly instead:
-
-```bash
-docker run -d ... \
-    -e PUBLIC_FRONTEND_URL=https://torrents.example.com \
-    -e NEXTAUTH_URL=https://torrents.example.com \
-    ghcr.io/torrenclou/torrentclou:latest
-```
-
-Traefik and Caddy both send those headers by default.
-
-## Storing downloads on a specific disk
-
-Bind-mount a path instead of using the named volume:
-
-```bash
--v /mnt/big-disk/torrents:/data/downloads
-```
-
-Torrents can be large, and this is the volume that grows.
+Traefik (including Dokploy and Coolify) and Caddy forward `X-Forwarded-Host` and `X-Forwarded-Proto`
+automatically, allowing TorrentDrive to derive its own public URL for Google Drive OAuth callbacks.
 
 ## Next steps
 
-- [First-run setup](/docs/first-run) — create your account and connect storage
-- [Usage guide](/docs/usage) — adding torrents and watching transfers
+- [First-run setup](/docs/first-run) — create your admin account and connect storage
+- [Usage guide](/docs/usage) — batch torrent analysis, selective file picking, and failover
 - [Security](/docs/security) — read this before exposing an instance to the internet
-- [Updating](/docs/updating) — upgrades, backups and rollbacks
+- [Updating](/docs/updating) — upgrades, backups, and rollbacks

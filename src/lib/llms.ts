@@ -28,14 +28,6 @@ interface ConfigEntry {
 
 const configSchema = schema as { productVersion: string; entries: ConfigEntry[] };
 
-/**
- * Expands the MDX components in the configuration page into plain Markdown.
- *
- * llms-full.txt is assembled from the raw MDX, so a rendered component arrives
- * as a literal `<ConfigTable filter="required" />` tag. That silently removed
- * the entire configuration reference from the text an assistant reads, which is
- * the one page most likely to be asked about.
- */
 const NEWLINE = String.fromCharCode(10);
 
 function expandComponents(body: string): string {
@@ -75,7 +67,7 @@ function expandComponents(body: string): string {
     .replace(/<ConfigTable\s*\/>/g, () => table("all"))
     .replace(
       /<ConfigSchemaVersion\s*\/>/g,
-      `Generated from TorrenClou ${configSchema.productVersion}, describing ${configSchema.entries.length} configuration values.`,
+      `Generated from TorrentDrive ${configSchema.productVersion}, describing ${configSchema.entries.length} configuration values.`,
     );
 }
 
@@ -93,14 +85,6 @@ export interface DocEntry {
   slug: string;
 }
 
-/**
- * The slugs of every page, in the order meta.json puts them in the sidebar.
- *
- * source.getPages() returns them alphabetically, which for a reader starting at
- * the top means Architecture before Overview. An assistant consuming llms.txt
- * reads top to bottom, so it should get the same order a person browsing the
- * sidebar would.
- */
 function navOrder(): string[] {
   const order: string[] = [];
   const rootMeta = join(DOCS_DIR, "meta.json");
@@ -115,9 +99,6 @@ function navOrder(): string[] {
       const child = JSON.parse(readFileSync(childMeta, "utf8")) as { pages?: string[] };
       for (const sub of child.pages ?? []) {
         if (sub.startsWith("---")) continue;
-        // A folder's index page has the slug of the folder itself
-        // ("paas/index.mdx" -> "paas"), so pushing "paas/index" here would
-        // never match and the page would sort to the end of the list.
         order.push(sub === "index" ? entry : `${entry}/${sub}`);
       }
     } else {
@@ -159,18 +140,38 @@ export function buildLlmsTxt(): string {
     "",
     `> ${siteConfig.description}`,
     "",
-    "TorrenClou downloads torrents on your own server and uploads them to Google Drive",
-    "or S3-compatible storage, then deletes the local copy. It ships as a single Docker",
-    "container that generates its own secrets and is configured entirely in the browser —",
-    "there is no configuration file to edit and no environment variable that must be set.",
+    "TorrentDrive is an open-source, self-hosted torrent-to-Google Drive and S3 cloud downloader.",
+    "It runs on your remote VPS, Dokploy, or Coolify server so your home ISP never sees BitTorrent",
+    "peer connections or tracker announces. It enforces MSE/PE RC4 stream encryption, strict BEP 27",
+    "private-tracker isolation, selective batch file picking, and automatic storage failover across",
+    "Google Drive and S3-compatible providers (AWS S3, Cloudflare R2, Backblaze B2, Wasabi, MinIO).",
     "",
-    "Install with one command:",
+    "## Key Facts & Architecture",
     "",
+    "- **Category**: Self-Hosted Cloud Torrent Downloader / ISP-Blind Seedbox to Google Drive & S3",
+    "- **Stack**: .NET 9 (ASP.NET Core API, Hangfire Orchestrator, MonoTorrent Engine, Google Drive & S3 Workers), Next.js App Router UI, PostgreSQL 15, Redis 7, Prometheus & Grafana",
+    "- **Default Web Port**: `47100` (same-origin API proxy; internal admin ports `47200`, `47500`, `47600` bind to `127.0.0.1`)",
+    "- **Container Image**: `ghcr.io/torrentdrive/torrentdrive:latest`",
+    "- **License**: MIT",
+    "",
+    "## Install in One Command",
+    "",
+    "Linux / macOS:",
     "```bash",
-    "curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash",
+    "curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.sh | bash",
     "```",
     "",
-    "## Docs",
+    "Docker Compose (Zero `.env` Required):",
+    "```bash",
+    "curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/docker-compose.yml -o docker-compose.yml && docker compose up -d",
+    "```",
+    "",
+    "Windows PowerShell:",
+    "```powershell",
+    "irm https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.ps1 | iex",
+    "```",
+    "",
+    "## Documentation",
     "",
   ];
 
@@ -210,8 +211,6 @@ export async function buildLlmsFullTxt(): Promise<string> {
     try {
       body = expandComponents(stripFrontmatter(await readFile(join(DOCS_DIR, entry.file), "utf8")));
     } catch {
-      // A page listed by the loader with no readable file on disk. Skip it
-      // rather than emitting a heading with nothing under it.
       continue;
     }
     parts.push(`# ${entry.title}`, "", `Source: ${entry.url}`, "", body, "", "---", "");

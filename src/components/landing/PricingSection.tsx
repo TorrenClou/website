@@ -19,7 +19,7 @@ const PRICING: PricingCardData = {
     { text: "Full source code access" },
     { text: "Community support via GitHub" },
   ],
-  githubUrl: "https://github.com/TorrenClou",
+  githubUrl: "https://github.com/TorrentDrive",
 };
 
 export function PricingSection() {

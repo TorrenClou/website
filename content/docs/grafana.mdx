@@ -1,98 +1,54 @@
 ---
 title: Grafana Monitoring
-description: Monitor your TorrenClou instance with built-in Grafana dashboards.
+description: Monitor your TorrentDrive instance with pre-provisioned Grafana and Prometheus dashboards.
 ---
 
 ## Overview
 
-Grafana, Prometheus, and Loki are **bundled inside the TorrenClou Docker container** — no extra setup needed. After installation, monitoring is available immediately:
+Grafana, Prometheus, and Loki are **bundled and pre-provisioned inside the TorrentDrive container** —
+data sources and dashboards are wired automatically on boot.
 
-| Service | URL | Credentials |
+| Service | Default Local URL | Credentials |
 |---|---|---|
-| Grafana | `http://localhost:47500` | `admin` / `admin` |
-| Prometheus | `http://localhost:47600` | — |
+| Grafana | `http://127.0.0.1:47500` | Username `admin` · Password generated in `/data/postgres/secrets.env` |
+| Prometheus | `http://127.0.0.1:47600` | — |
 
-Prometheus metrics and tracing are enabled by default when using the one-command installer.
+### Finding Your Grafana Password
 
-## Prometheus Metrics
+On first boot, `entrypoint.sh` generates a random `GRAFANA_ADMIN_PASSWORD` and saves it to
+`/data/postgres/secrets.env`. Retrieve it with:
 
-TorrenClou exposes a `/metrics` endpoint on the API port:
-
+```bash
+docker exec torrentdrive grep GRAFANA_ADMIN_PASSWORD /data/postgres/secrets.env
 ```
-http://localhost:47200/metrics
+
+Or set your own password before first boot via `-e GRAFANA_ADMIN_PASSWORD=your-secret`.
+
+### Accessing Grafana on a Remote Server
+
+Because port `47500` is bound to `127.0.0.1` by default for security, reach it over an SSH tunnel:
+
+```bash
+ssh -L 47500:127.0.0.1:47500 user@your-server
 ```
 
-### Add Prometheus Data Source in Grafana
+Then open `http://localhost:47500` in your browser.
 
-1. Open Grafana at `http://localhost:47500` and log in (`admin` / `admin`)
-2. Go to **Configuration** → **Data Sources** → **Add data source**
-3. Select **Prometheus**
-4. Set the URL to `http://localhost:47600`
-5. Click **Save & Test**
+## Pre-Provisioned Data Sources & Dashboards
 
-### Key Metrics
+TorrentDrive automatically provisions:
+
+- **Prometheus** (`http://localhost:47600`) scraping `/metrics` from the API (`:47200`) and workers
+- **Loki** (`http://localhost:3100`) for structured container logs
+- **TorrentDrive Overview Dashboard** tracking active downloads, upload throughput, job queue depth,
+  and worker processing duration
+
+## Key Prometheus Metrics
 
 | Metric | Description |
 |---|---|
-| `torrencloud_downloads_total` | Total downloads processed |
-| `torrencloud_downloads_active` | Currently active downloads |
-| `torrencloud_uploads_total` | Total cloud uploads completed |
-| `torrencloud_job_queue_depth` | Pending jobs in the queue |
-| `torrencloud_job_duration_seconds` | Job processing duration histogram |
-
-## Loki Logs
-
-With `OBSERVABILITY_LOKI_URL` set, TorrenClou pushes structured logs to the built-in Loki instance. It is unset by default, and the bundled Grafana and Prometheus work without it.
-
-### Add Loki Data Source in Grafana
-
-1. Go to **Configuration** → **Data Sources** → **Add data source**
-2. Select **Loki**
-3. Set the URL to `http://localhost:47700`
-4. Click **Save & Test**
-
-### Useful Log Queries
-
-Filter download events:
-
-```
-{app="torrencloud"} |= "download"
-```
-
-Filter errors:
-
-```
-{app="torrencloud"} | logfmt | level = "error"
-```
-
-## OpenTelemetry Traces
-
-With `OBSERVABILITY_ENABLE_TRACING=true` (enabled by default), TorrenClou exports distributed traces.
-
-Traces cover the full lifecycle: torrent download → file processing → cloud upload.
-
-## Build a Dashboard
-
-Create a new dashboard in Grafana and add panels for:
-
-- **Active Downloads** — gauge using `torrencloud_downloads_active`
-- **Download Throughput** — graph using `rate(torrencloud_downloads_total[5m])`
-- **Upload Success Rate** — stat using `torrencloud_uploads_total`
-- **Queue Depth** — graph using `torrencloud_job_queue_depth`
-- **Error Logs** — logs panel using Loki `{app="torrencloud"} | logfmt | level = "error"`
-- **Job Duration** — heatmap using `torrencloud_job_duration_seconds`
-
-## Enable Additional Observability
-
-To ship logs and traces to an external backend, pass these as environment variables:
-
-```ini
-OBSERVABILITY_LOKI_URL=http://localhost:47700
-OBSERVABILITY_OTLP_ENDPOINT=http://localhost:47800
-```
-
-These are read at start, so restart the container after changing them:
-
-```bash
-docker restart torrencloud
-```
+| `torrentdrive_downloads_total` | Total torrent downloads processed |
+| `torrentdrive_downloads_active` | Currently active torrent downloads |
+| `torrentdrive_uploads_total` | Total cloud uploads completed |
+| `torrentdrive_job_queue_depth` | Pending jobs across Hangfire queues |
+| `torrentdrive_job_duration_seconds` | End-to-end job processing duration histogram |

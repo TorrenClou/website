@@ -12,13 +12,13 @@
  * rather than claiming to be production.
  */
 export const siteConfig = {
-  name: "TorrenClou",
+  name: "TorrentDrive",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://tc.gitnasr.com").replace(/\/$/, ""),
-  tagline: "Torrent to Cloud, One Command Away",
+  tagline: "Torrent to Google Drive Without Your ISP Knowing",
   description:
-    "Self-hosted torrent-to-cloud sync. Download torrents and auto-sync to Google Drive or S3. One Docker container, one command.",
+    "TorrentDrive is an open-source, ISP-blind, self-hosted torrent-to-Google Drive and S3 cloud downloader. Offload BitTorrent swarms to a remote Docker container with MSE/PE RC4 encryption and stream completed files directly to Google Drive or S3 over HTTPS.",
   docsPath: "/docs",
-  github: "https://github.com/TorrenClou",
+  github: "https://github.com/TorrentDrive",
   twitter: "@c0nasr",
   license: "MIT",
 } as const;

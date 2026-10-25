@@ -1,1 +1,1 @@
-ghcr.io/torrenclou/torrentclou
+ghcr.io/torrentdrive/torrentdrive

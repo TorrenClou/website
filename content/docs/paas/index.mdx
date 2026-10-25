@@ -1,9 +1,9 @@
 ---
 title: Deploying on a PaaS
-description: Run TorrenClou on Dokploy, Coolify, Railway or Render — and the one setting that decides whether your data survives.
+description: Run TorrentDrive on Dokploy, Coolify, Railway or Render — and the one setting that decides whether your data survives.
 ---
 
-TorrenClou runs on any platform that can run a container and attach a disk.
+TorrentDrive runs on any platform that can run a container and attach a disk.
 
 | Platform | Guide |
 |----------|-------|
@@ -56,7 +56,7 @@ applying the moment there is a disk.
 
 If you genuinely want split services, do it on your own Docker host, where a
 named volume **can** be shared between containers:
-[`compose/docker-compose.split.yml`](https://github.com/TorrenClou/deploy/blob/main/compose/docker-compose.split.yml).
+[`compose/docker-compose.split.yml`](https://github.com/TorrentDrive/deploy/blob/main/compose/docker-compose.split.yml).
 
 ## Sizing
 
@@ -66,10 +66,10 @@ the platform reports it as a crash loop with no obvious cause.
 
 ## Pinning a version
 
-Every blueprint defaults to `latest` and honours `TORRENCLOU_VERSION`:
+Every blueprint defaults to `latest` and honours `TORRENTDRIVE_VERSION`:
 
 ```
-TORRENCLOU_VERSION=1.1.0
+TORRENTDRIVE_VERSION=1.1.0
 ```
 
 Read [Updating](/docs/updating) before rolling back — an older image refuses to

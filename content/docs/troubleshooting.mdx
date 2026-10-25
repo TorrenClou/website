@@ -6,13 +6,13 @@ description: What to check when the container will not start, storage will not c
 Start here:
 
 ```bash
-docker logs -f torrencloud
+docker logs -f torrentdrive
 ```
 
 Nine processes share that log, each line prefixed with which one it came from.
 
 ```bash
-docker exec torrencloud supervisorctl status
+docker exec torrentdrive supervisorctl status
 ```
 
 That lists all nine and whether each is actually running — a crash-looping worker still leaves
@@ -30,7 +30,7 @@ The second tells you whether the instance thinks it has been set up.
 ## The container will not start
 
 ```bash
-docker logs torrencloud | head -50
+docker logs torrentdrive | head -50
 ```
 
 **`address already in use`** — something else holds 47100 or 47200. Find it with
@@ -86,7 +86,7 @@ curl http://localhost:47200/api/setup/status
 or renamed volume. Check what is actually mounted:
 
 ```bash
-docker inspect torrencloud --format '{{json .Mounts}}'
+docker inspect torrentdrive --format '{{json .Mounts}}'
 ```
 
 ## I cannot log in
@@ -164,13 +164,13 @@ Directories counted as **orphaned** have no matching job. They are never deleted
 remove them by hand if you are sure:
 
 ```bash
-docker exec torrencloud ls -la /data/downloads
+docker exec torrentdrive ls -la /data/downloads
 ```
 
 ## Getting into the database
 
 ```bash
-docker exec -it torrencloud psql -U torrenclo_user -d torrenclo
+docker exec -it torrentdrive psql -U torrentdrive_user -d torrentdrive
 ```
 
 Tables live in the `dev` schema, so quote them:
@@ -181,9 +181,9 @@ SELECT * FROM dev."UserJobs";
 
 ## Nothing here helped
 
-Open an issue on [TorrenClou/deploy](https://github.com/TorrenClou/deploy/issues) with:
+Open an issue on [TorrentDrive/deploy](https://github.com/TorrentDrive/deploy/issues) with:
 
-- `docker logs torrencloud | tail -100`
-- `docker exec torrencloud supervisorctl status`
+- `docker logs torrentdrive | tail -100`
+- `docker exec torrentdrive supervisorctl status`
 - Your `docker run` command, with secrets removed
-- The image tag: `docker inspect torrencloud --format '{{.Config.Image}}'`
+- The image tag: `docker inspect torrentdrive --format '{{.Config.Image}}'`

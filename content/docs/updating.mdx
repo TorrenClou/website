@@ -6,7 +6,7 @@ description: Upgrades, backups, rolling back, and pinning a version.
 ## The short version
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.sh | bash
 ```
 
 The installer replaces the container and leaves the volumes alone, so your database, downloads
@@ -15,8 +15,8 @@ and secrets survive.
 Or by hand:
 
 ```bash
-docker pull ghcr.io/torrenclou/torrentclou:latest
-docker rm -f torrencloud
+docker pull ghcr.io/torrentdrive/torrentdrive:latest
+docker rm -f torrentdrive
 # then the same docker run you used originally
 ```
 
@@ -24,35 +24,35 @@ Database migrations run automatically at start. Watch for
 `Database migrations applied successfully`:
 
 ```bash
-docker logs -f torrencloud
+docker logs -f torrentdrive
 ```
 
 ## Before a big upgrade: back up
 
-The one thing you cannot recreate is the `torrencloud-pgdata` volume. It holds your account,
+The one thing you cannot recreate is the `torrentdrive-pgdata` volume. It holds your account,
 your storage credentials, your job history — **and the generated secrets**.
 
 ```bash
-docker exec torrencloud pg_dump -U torrenclo_user torrenclo > torrenclou-backup.sql
-docker exec torrencloud cat /data/postgres/secrets.env > torrenclou-secrets.env
+docker exec torrentdrive pg_dump -U torrentdrive_user torrentdrive > torrentdrive-backup.sql
+docker exec torrentdrive cat /data/postgres/secrets.env > torrentdrive-secrets.env
 ```
 
 PowerShell:
 
 ```powershell
-docker exec torrencloud pg_dump -U torrenclo_user torrenclo | Out-File -Encoding utf8 torrenclou-backup.sql
-docker exec torrencloud cat /data/postgres/secrets.env | Out-File -Encoding utf8 torrenclou-secrets.env
+docker exec torrentdrive pg_dump -U torrentdrive_user torrentdrive | Out-File -Encoding utf8 torrentdrive-backup.sql
+docker exec torrentdrive cat /data/postgres/secrets.env | Out-File -Encoding utf8 torrentdrive-secrets.env
 ```
 
-Keep `torrenclou-secrets.env` somewhere safe and private — it contains the database password
+Keep `torrentdrive-secrets.env` somewhere safe and private — it contains the database password
 and the token signing keys. Restoring the database without it leaves everyone logged out and
 the database password mismatched.
 
 ## Restoring
 
 ```bash
-docker exec -i torrencloud psql -U torrenclo_user -d torrenclo < torrenclou-backup.sql
-docker restart torrencloud
+docker exec -i torrentdrive psql -U torrentdrive_user -d torrentdrive < torrentdrive-backup.sql
+docker restart torrentdrive
 ```
 
 If the container was recreated from scratch, put the secrets back before starting it, or pass
@@ -63,16 +63,16 @@ the old `JWT_SECRET`, `NEXTAUTH_SECRET` and `POSTGRES_PASSWORD` as environment v
 Images are tagged `YYYY.MM.DD-<backend-sha>-<frontend-sha>` as well as `latest`:
 
 ```bash
-docker rm -f torrencloud
-docker run -d ... ghcr.io/torrenclou/torrentclou:2026.01.15-a1b2c3d-e4f5g6h
+docker rm -f torrentdrive
+docker run -d ... ghcr.io/torrentdrive/torrentdrive:2026.01.15-a1b2c3d-e4f5g6h
 ```
 
-The tag list is on the [package page](https://github.com/orgs/TorrenClou/packages).
+The tag list is on the [package page](https://github.com/orgs/TorrentDrive/packages).
 
 **Migrations do not roll back.** If the version you are leaving added a database change, the
 older image is running against a schema it does not know about.
 
-TorrenClou will not let that happen quietly. On start it compares the migrations recorded in
+TorrentDrive will not let that happen quietly. On start it compares the migrations recorded in
 the database against the ones the running build knows about, and if the database has any it
 has never heard of, it refuses to start:
 
@@ -88,7 +88,7 @@ If you understand the risk and want to start anyway — for instance because the
 only added a column the older code never reads:
 
 ```bash
-docker run -d ... -e ALLOW_SCHEMA_AHEAD=true ghcr.io/torrenclou/torrentclou:1.4.1
+docker run -d ... -e ALLOW_SCHEMA_AHEAD=true ghcr.io/torrentdrive/torrentdrive:1.4.1
 ```
 
 Nothing validates that judgement for you. The older code will read and write the newer schema
@@ -126,7 +126,7 @@ rollback is safe.
 The image tag is also readable directly:
 
 ```bash
-docker inspect torrencloud --format '{{.Config.Image}}'
+docker inspect torrentdrive --format '{{.Config.Image}}'
 ```
 
 
@@ -138,8 +138,8 @@ development. There is no fixed schedule. Pin a tag if you want a slower pace.
 ## Uninstalling
 
 ```bash
-docker rm -f torrencloud
-docker volume rm torrencloud-pgdata torrencloud-redis torrencloud-downloads
+docker rm -f torrentdrive
+docker volume rm torrentdrive-pgdata torrentdrive-redis torrentdrive-downloads
 ```
 
 The second command deletes everything, including your account. Take a backup first if there is

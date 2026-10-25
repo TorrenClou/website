@@ -43,10 +43,10 @@ jobs:
         run: |
           set -euo pipefail
 
-          tag=$(gh release view --repo TorrenClou/backend --json tagName --jq .tagName)
+          tag=$(gh release view --repo TorrentDrive/backend --json tagName --jq .tagName)
           echo "Latest backend release: ${tag}"
 
-          if ! gh release download "$tag" --repo TorrenClou/backend \
+          if ! gh release download "$tag" --repo TorrentDrive/backend \
                  --pattern config-schema.json --output /tmp/config-schema.json --clobber; then
             echo "::warning::Release ${tag} has no config-schema.json asset. Nothing to sync."
             echo "changed=false" >> "$GITHUB_OUTPUT"

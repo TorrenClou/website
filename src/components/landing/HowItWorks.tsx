@@ -1,26 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Upload, Settings, CloudDownload } from "lucide-react";
+import { Settings, Upload, CloudDownload } from "lucide-react";
 import type { HowItWorksStep } from "@/types";
 
 const STEPS: HowItWorksStep[] = [
   {
     step: 1,
-    title: "Add Your Torrent",
-    description: "Upload a .torrent file from the dashboard and the download starts instantly.",
-    icon: Upload,
-  },
-  {
-    step: 2,
-    title: "Connect Your Cloud",
-    description: "Link Google Drive via OAuth or add your S3-compatible credentials.",
+    title: "Claim & Connect Storage",
+    description:
+      "Start the container, create your admin account in the setup wizard, and connect Google Drive or S3.",
     icon: Settings,
   },
   {
+    step: 2,
+    title: "Analyze & Pick Files",
+    description:
+      "Drop one or more .torrent files, inspect live seeders and health scores, and select the exact files you want.",
+    icon: Upload,
+  },
+  {
     step: 3,
-    title: "Files Land in Your Cloud",
-    description: "Downloads complete and auto-sync to your storage. Every time.",
+    title: "Automatic Cloud Delivery",
+    description:
+      "TorrentDrive downloads in the background, streams files to your cloud with automatic failover, and reclaims local disk space.",
     icon: CloudDownload,
   },
 ];
@@ -33,7 +36,7 @@ export function HowItWorks() {
           <h2 className="text-3xl font-bold text-white sm:text-4xl">
             How It Works
           </h2>
-          <p className="mt-4 text-surface-50">Three steps. That&apos;s it.</p>
+          <p className="mt-4 text-surface-50">Three steps from .torrent to cloud storage.</p>
         </div>
 
         <div className="grid gap-8 md:grid-cols-3">

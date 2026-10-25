@@ -1,80 +1,90 @@
 ---
 title: Overview
-description: TorrenClou is a self-hosted torrent-to-cloud platform. One Docker container, one command, no configuration files.
+description: TorrentDrive is a self-hosted torrent-to-cloud platform. One Docker container, one command, no configuration files.
 ---
 
-TorrenClou downloads torrents on your server and uploads them to Google Drive or S3-compatible
-storage, then cleans up after itself.
+TorrentDrive downloads torrents on your server and uploads them directly to Google Drive or
+S3-compatible storage, then cleans up local disk space automatically.
 
-Everything ships as one container that generates its own secrets and is configured in the
-browser. If you find yourself editing a config file to do something ordinary, that is a bug —
-please [open an issue](https://github.com/TorrenClou/deploy/issues).
+Everything ships as a single container that generates its own secrets on first boot and is
+configured entirely in the browser. If you find yourself editing a config file to do something
+ordinary, that is a bug — please [open an issue](https://github.com/TorrentDrive/deploy/issues).
 
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/TorrenClou/deploy/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.sh | bash
+```
+
+Or with Docker Compose (zero `.env` required):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/docker-compose.yml -o docker-compose.yml
+docker compose up -d
 ```
 
 Windows, in PowerShell:
 
 ```powershell
-irm https://raw.githubusercontent.com/TorrenClou/deploy/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.ps1 | iex
 ```
 
-Docker is the only requirement. Open the URL it prints and create your account.
+Docker is the only requirement. Open the URL it prints and complete the 3-step setup wizard.
 
 ## What it does
 
-- Add a torrent by file or magnet link, inspect its contents, and download **only the files you
-  actually want**.
-- Upload finished downloads to **Google Drive** or **S3** — AWS, Backblaze B2, Cloudflare R2,
-  DigitalOcean Spaces, Wasabi, MinIO.
+- Upload one or more `.torrent` files, inspect live UDP/HTTP tracker swarm health, and download
+  **only the files you actually want**.
+- Hardened BitTorrent engine with MSE/PE RC4 stream encryption, strict **BEP 27** private-torrent
+  isolation (disabling DHT, PEX, Local Peer Discovery, and public fallback trackers on private
+  torrents), and zero UPnP/NAT-PMP gateway noise on cloud VPSs.
+- Upload finished downloads to **Google Drive** or **S3-compatible storage** — AWS S3, Cloudflare R2,
+  Backblaze B2, DigitalOcean Spaces, Wasabi, and MinIO.
 - Uses **your** storage credentials. Nothing is proxied through a third party.
-- Reroutes a failing upload to another healthy drive instead of giving up.
-- Deletes local copies once they are safely uploaded, so the disk does not fill.
-- Watch transfers, retries and failures from the dashboard, with Grafana dashboards bundled in
-  if you want them.
+- Continuously probes storage health and automatically reroutes a failing upload to another healthy
+  drive instead of giving up.
+- Deletes local copies once they are safely uploaded, or lets you purge them on demand.
+- Bundled Prometheus and Grafana dashboards for real-time transfer and queue observability.
 
 ## Ports
 
-| Port | Service |
-|------|---------|
-| 47100 | Web interface |
-| 47200 | API, plus `/hangfire` |
-| 47500 | Grafana |
-| 47600 | Prometheus |
+| Port | Default Bind | Service |
+|------|--------------|---------|
+| 47100 | `0.0.0.0` | Web interface (proxies API calls same-origin) |
+| 47200 | `127.0.0.1` | REST API, `/metrics`, and `/hangfire` |
+| 47500 | `127.0.0.1` | Grafana dashboards |
+| 47600 | `127.0.0.1` | Prometheus metrics |
 
-Only 47100 needs to be reachable for normal use.
+Only port **47100** needs to be reachable for normal use. Internal admin ports are bound to
+`127.0.0.1` by default so they are never accidentally exposed on public VPS interfaces.
 
 ## Where to go next
 
 **Getting started**
 
-- [Installation](/docs/getting-started) — the one-liner, manual `docker run`, reverse proxies,
-  custom domains
-- [First-run setup](/docs/first-run) — the wizard, connecting Google Drive, connecting S3
+- [Installation](/docs/getting-started) — one-liner, Docker Compose, reverse proxies, custom domains
+- [PaaS Deployments](/docs/paas) — 1-click templates for [Dokploy](/docs/paas/dokploy), [Coolify](/docs/paas/coolify), [Render](/docs/paas/render), and [Railway](/docs/paas/railway)
+- [First-run setup](/docs/first-run) — claiming your instance and connecting Google Drive or S3
 
 **Running it**
 
-- [Usage guide](/docs/usage) — adding torrents, picking files, watching transfers
-- [Configuration](/docs/configuration) — every setting, and the environment overrides
+- [Usage guide](/docs/usage) — batch torrent analysis, selective file picking, destination failover, and pinning
+- [Configuration](/docs/configuration) — every setting and environment override
 - [Updating](/docs/updating) — upgrades, backups, rollbacks
 - [Troubleshooting](/docs/troubleshooting) — when something does not work
 
 **Understanding it**
 
-- [Architecture](/docs/architecture) — what runs inside the container, and how a torrent becomes
-  a file in your storage
-- [Security](/docs/security) — where secrets live, what is exposed, what to put behind a proxy
+- [Architecture](/docs/architecture) — what runs inside the container and how the transfer pipeline works
+- [Security](/docs/security) — where secrets live, what is exposed, and how to put it behind a proxy
 
 ## Source
 
 | Repository | Contents |
 |------------|----------|
-| [deploy](https://github.com/TorrenClou/deploy) | The all-in-one image, the installer, and CI |
-| [backend](https://github.com/TorrenClou/backend) | .NET 9 API and the three workers |
-| [frontend](https://github.com/TorrenClou/frontend) | Next.js web app |
-| [website](https://github.com/TorrenClou/website) | This documentation |
+| [deploy](https://github.com/TorrentDrive/deploy) | The all-in-one image, compose manifests, PaaS blueprints, and installer |
+| [backend](https://github.com/TorrentDrive/backend) | .NET 9 API, Hangfire orchestrator, and transfer workers |
+| [frontend](https://github.com/TorrentDrive/frontend) | Next.js web application |
+| [website](https://github.com/TorrentDrive/website) | Landing site and documentation |
 
 MIT licensed.
