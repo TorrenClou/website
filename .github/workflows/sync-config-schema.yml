@@ -1,16 +1,12 @@
 name: Sync config schema
 
-# Pulls the configuration schema from the latest backend release and opens a PR
-# when it has changed.
+# Pulls the configuration schema from the latest backend release and commits it
+# directly to main when it has changed.
 #
 # The schema is committed here rather than fetched at build time, deliberately.
 # A build-time fetch makes every production deploy depend on GitHub being
 # reachable, and the failure lands at the worst possible moment with no good
 # fallback — serving stale data silently is worse than not fetching at all.
-#
-# Committing it also means a human sees the diff. When a PR shows
-# `JWT_SECRET: required false -> true`, that is a review moment rather than a
-# value that quietly changed underneath the documentation.
 #
 # It tracks the latest *release*, not main: a documentation site describes
 # released software, so if this sync never runs the site keeps describing the
@@ -24,7 +20,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 concurrency:
   group: sync-config-schema
@@ -35,6 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Download the schema from the latest backend release
         id: fetch
@@ -43,7 +41,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          tag=$(gh release view --repo TorrentDrive/backend --json tagName --jq .tagName)
+          tag=$(gh release view --repo TorrentDrive/backend --json tagName --jq .tagName 2>/dev/null || echo "")
+          if [ -z "$tag" ]; then
+            echo "::warning::No release found in TorrentDrive/backend. Nothing to sync."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           echo "Latest backend release: ${tag}"
 
           if ! gh release download "$tag" --repo TorrentDrive/backend \
@@ -61,7 +64,7 @@ jobs:
           fi
 
           mkdir -p content/generated
-          if cmp -s /tmp/config-schema.json content/generated/config-schema.json; then
+          if [ -f content/generated/config-schema.json ] && cmp -s /tmp/config-schema.json content/generated/config-schema.json; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "Already up to date."
           else
@@ -71,31 +74,18 @@ jobs:
             echo "entries=$(jq '.entries | length' content/generated/config-schema.json)" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Open or update the sync PR
+      - name: Commit and push updated schema to main
         if: steps.fetch.outputs.changed == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           tag="${{ steps.fetch.outputs.tag }}"
-          branch="chore/config-schema"
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git checkout -B "$branch"
           git add content/generated/config-schema.json
-          git commit -m "docs: sync configuration schema for backend ${tag}"
-          git push --force-with-lease origin "$branch"
-
-          title="docs: sync configuration schema for backend ${tag}"
-          body="Configuration reference regenerated from backend \`${tag}\`, now describing ${{ steps.fetch.outputs.entries }} values.
-
-          Read the diff rather than merging on sight. A value becoming required, changing its default, or disappearing is a behaviour change in the product, and this file is the only place it shows up as a reviewable line."
-
-          existing=$(gh pr list --head "$branch" --state open --json number --jq '.[0].number // empty')
-          if [ -n "$existing" ]; then
-            gh pr edit "$existing" --title "$title" --body "$body"
-          else
-            gh pr create --base main --head "$branch" --title "$title" --body "$body"
+          if ! git diff --cached --quiet; then
+            git commit -m "docs(schema): sync configuration schema for backend ${tag} [skip ci]"
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
