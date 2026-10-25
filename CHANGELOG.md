@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.1.0](https://github.com/TorrentDrive/website/releases/tag/v2.1.0) (2026-10-25)
+
+* ci: simplify CI/CD pipeline with direct automatic SemVer releases on main (795dac5)
+* feat: rebrand to TorrentDrive, add AI-SEO & ISP-blind torrent engine, and upgrade UI/PaaS/docs (dffc275)
+
+
 ## [0.1.3](https://github.com/TorrentDrive/website/compare/v0.1.2...v0.1.3) (2026-09-03)
 
 
