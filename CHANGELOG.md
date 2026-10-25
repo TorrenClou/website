@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/TorrenClou/website/compare/v0.1.3...v0.2.0) (2026-10-25)
+
+
+### Features
+
+* rebrand to TorrentDrive, add AI-SEO & ISP-blind torrent engine, and upgrade UI/PaaS/docs ([dffc275](https://github.com/TorrenClou/website/commit/dffc275efca37caeb92eb13b7422083fa1a10830))
+
 ## [0.1.3](https://github.com/TorrentDrive/website/compare/v0.1.2...v0.1.3) (2026-09-03)
 
 
