@@ -47,6 +47,11 @@
   --ring: 170 76% 30%;
 
   --radius: 0.5rem;
+
+  /* Custom easing tokens (Emil Kowalski & Jakub Krehel curves) */
+  --ease-out-quart: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-cubic: cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 @theme inline {
@@ -119,14 +124,13 @@
   --radius-sm: calc(var(--radius) - 4px);
 
   /* Animations */
-  --animate-fade-up: fade-up 0.4s ease-out;
-  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-fade-up: fade-up 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -134,18 +138,16 @@
   }
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-/* Base styles */
+/* Base styles & themed browser surfaces */
 * {
   border-color: hsl(var(--border));
+}
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #2b3230 #121212;
 }
 
 body {
@@ -154,6 +156,20 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(18, 135, 117, 0.35);
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid #3c9483;
+  outline-offset: 2px;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
 /* ============================================================
@@ -234,4 +250,16 @@ figure.shiki [role="region"]::-webkit-scrollbar-thumb:hover {
 
 .gradient-surface {
   background: linear-gradient(180deg, #282828 0%, #121212 100%);
+}
+
+/* Mandatory Reduced Motion Safety Net */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

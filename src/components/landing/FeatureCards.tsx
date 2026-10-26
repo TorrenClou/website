@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   FileDown,
   Cloud,
@@ -54,26 +54,28 @@ const FEATURES: FeatureCardProps[] = [
 function FeatureCard({
   feature,
   index,
+  shouldReduceMotion,
 }: {
   feature: FeatureCardProps;
   index: number;
+  shouldReduceMotion: boolean;
 }) {
   const Icon = feature.icon;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{
-        duration: 0.4,
-        delay: index * 0.07,
+        duration: 0.35,
+        delay: shouldReduceMotion ? 0 : index * 0.05,
         ease: [0.22, 1, 0.36, 1],
       }}
     >
-      <Card className="h-full transition-colors duration-200 hover:border-primary-500/30 hover:bg-surface-tonal-400/50">
-        <div className="mb-4 inline-flex rounded-lg bg-primary-500/10 p-2.5">
-          <Icon size={22} className="text-primary-400" />
+      <Card className="group h-full transition-colors duration-150 hover:border-primary-500/40 hover:bg-surface-tonal-400/50">
+        <div className="mb-4 inline-flex rounded-lg border border-primary-500/20 bg-primary-500/10 p-2.5 transition-colors duration-150 group-hover:border-primary-500/40 group-hover:bg-primary-500/15">
+          <Icon size={20} className="text-primary-400" />
         </div>
         <h3 className="mb-2 text-base font-semibold text-white">
           {feature.title}
@@ -87,6 +89,8 @@ function FeatureCard({
 }
 
 export function FeatureCards() {
+  const shouldReduceMotion = Boolean(useReducedMotion());
+
   return (
     <section className="py-20">
       <div className="mx-auto max-w-6xl px-6">
@@ -94,14 +98,19 @@ export function FeatureCards() {
           <h2 className="text-3xl font-bold text-white sm:text-4xl">
             Core Features
           </h2>
-          <p className="mt-4 text-surface-50">
+          <p className="mt-3 text-surface-50">
             Built for ISP-blind, encrypted, hands-off torrent-to-Google Drive and S3 transfers.
           </p>
         </div>
 
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((feature, index) => (
-            <FeatureCard key={feature.title} feature={feature} index={index} />
+            <FeatureCard
+              key={feature.title}
+              feature={feature}
+              index={index}
+              shouldReduceMotion={shouldReduceMotion}
+            />
           ))}
         </div>
       </div>

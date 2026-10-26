@@ -1,16 +1,25 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Settings, Upload, CloudDownload } from "lucide-react";
+import { useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Settings, Upload, CloudDownload, Terminal } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { HowItWorksStep } from "@/types";
 
-const STEPS: HowItWorksStep[] = [
+interface InteractiveStep extends HowItWorksStep {
+  artifactLabel: string;
+  artifactDetail: string;
+}
+
+const STEPS: InteractiveStep[] = [
   {
     step: 1,
     title: "Claim & Connect Storage",
     description:
       "Start the container, create your admin account in the setup wizard, and connect Google Drive or S3.",
     icon: Settings,
+    artifactLabel: "POST /api/setup/claim -> 200 OK",
+    artifactDetail: "OAuth 2.0 Drive token + S3 endpoint encrypted with AES-256-GCM",
   },
   {
     step: 2,
@@ -18,6 +27,8 @@ const STEPS: HowItWorksStep[] = [
     description:
       "Drop one or more .torrent files, inspect live seeders and health scores, and select the exact files you want.",
     icon: Upload,
+    artifactLabel: "BEP 15 UDP + BEP 48 HTTP Scrape",
+    artifactDetail: "418 seeders verified · 3 of 14 files selected · Private flag respected",
   },
   {
     step: 3,
@@ -25,54 +36,110 @@ const STEPS: HowItWorksStep[] = [
     description:
       "TorrentDrive downloads in the background, streams files to your cloud with automatic failover, and reclaims local disk space.",
     icon: CloudDownload,
+    artifactLabel: "MSE/RC4 Swarm -> Multipart Cloud Stream",
+    artifactDetail: "SHA-1 verified pieces streamed over TLS 1.3 · Local staging purged",
   },
 ];
 
 export function HowItWorks() {
+  const [activeStep, setActiveStep] = useState<number>(1);
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <section className="py-20">
       <div className="mx-auto max-w-5xl px-6">
-        <div className="mb-16 text-center">
+        <div className="mb-14 text-center">
           <h2 className="text-3xl font-bold text-white sm:text-4xl">
             How It Works
           </h2>
-          <p className="mt-4 text-surface-50">Three steps from .torrent to cloud storage.</p>
+          <p className="mt-3 text-surface-50">
+            Three steps from .torrent to cloud storage.
+          </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-3">
           {STEPS.map((step, index) => {
             const Icon = step.icon;
+            const isActive = activeStep === step.step;
+
             return (
               <motion.div
                 key={step.step}
-                className="relative flex flex-col items-center text-center"
-                initial={{ opacity: 0, y: 16 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{
-                  duration: 0.4,
-                  delay: index * 0.15,
+                  duration: 0.35,
+                  delay: shouldReduceMotion ? 0 : index * 0.08,
                   ease: [0.22, 1, 0.36, 1],
                 }}
               >
-                {/* Connector line (not on last step) */}
-                {index < STEPS.length - 1 && (
-                  <div className="absolute top-8 left-[calc(50%+32px)] hidden h-px w-[calc(100%-64px)] border-t border-dashed border-surface-300/40 md:block" />
-                )}
+                <button
+                  type="button"
+                  onMouseEnter={() => setActiveStep(step.step)}
+                  onFocus={() => setActiveStep(step.step)}
+                  onClick={() => setActiveStep(step.step)}
+                  className={cn(
+                    "relative flex h-full w-full flex-col rounded-xl border p-6 text-left cursor-pointer transition-colors duration-150",
+                    isActive
+                      ? "border-primary-500/45 bg-surface-tonal-400/50"
+                      : "border-surface-300/30 bg-surface-tonal-500 hover:border-surface-200/40"
+                  )}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="how-it-works-active-outline"
+                      transition={{
+                        type: "spring",
+                        duration: 0.3,
+                        bounce: 0,
+                      }}
+                      className="pointer-events-none absolute inset-0 rounded-xl border border-primary-400/50"
+                    />
+                  )}
 
-                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-primary-500/30 bg-primary-500/10">
-                  <Icon size={26} className="text-primary-400" />
-                </div>
+                  <div className="mb-5 flex items-center justify-between">
+                    <div
+                      className={cn(
+                        "flex h-11 w-11 items-center justify-center rounded-lg border transition-colors duration-150",
+                        isActive
+                          ? "border-primary-500/40 bg-primary-500/15 text-primary-400"
+                          : "border-surface-300/35 bg-surface-400/40 text-surface-100"
+                      )}
+                    >
+                      <Icon size={20} />
+                    </div>
+                    <span
+                      className={cn(
+                        "rounded-md border px-2.5 py-0.5 font-mono text-xs font-semibold tabular-nums transition-colors duration-150",
+                        isActive
+                          ? "border-primary-500/35 bg-primary-500/15 text-primary-300"
+                          : "border-surface-300/30 bg-surface-400/40 text-surface-100"
+                      )}
+                    >
+                      0{step.step}
+                    </span>
+                  </div>
 
-                <span className="mb-2 text-xs font-bold uppercase tracking-widest text-primary-400">
-                  Step {step.step}
-                </span>
-                <h3 className="mb-2 text-lg font-semibold text-white">
-                  {step.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-surface-50">
-                  {step.description}
-                </p>
+                  <h3 className="mb-2 text-lg font-semibold text-white">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm leading-relaxed text-surface-50">
+                    {step.description}
+                  </p>
+
+                  <div className="mt-auto pt-5">
+                    <div className="rounded-lg border border-surface-300/25 bg-surface-500/80 p-3 font-mono text-xs">
+                      <div className="flex items-center gap-1.5 text-primary-400">
+                        <Terminal size={12} />
+                        <span className="truncate">{step.artifactLabel}</span>
+                      </div>
+                      <div className="mt-1 text-surface-100 leading-snug">
+                        {step.artifactDetail}
+                      </div>
+                    </div>
+                  </div>
+                </button>
               </motion.div>
             );
           })}

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { scaleIn } from "@/lib/animation-variants";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -23,6 +23,8 @@ const PRICING: PricingCardData = {
 };
 
 export function PricingSection() {
+  const shouldReduceMotion = Boolean(useReducedMotion());
+
   return (
     <section className="py-20">
       <div className="mx-auto max-w-6xl px-6">
@@ -30,27 +32,26 @@ export function PricingSection() {
           <h2 className="text-3xl font-bold text-white sm:text-4xl">
             Pricing
           </h2>
-          <p className="mt-4 text-surface-50">
+          <p className="mt-3 text-surface-50">
             No tricks. No tiers. Just free.
           </p>
         </div>
 
         <motion.div
           className="mx-auto max-w-md"
-          variants={scaleIn}
-          initial="hidden"
+          variants={shouldReduceMotion ? undefined : scaleIn}
+          initial={shouldReduceMotion ? false : "hidden"}
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
         >
-          <Card className="relative overflow-hidden border-primary-500/30 p-8">
+          <Card className="relative overflow-hidden border-primary-500/35 p-8">
             {/* Top accent line */}
             <div className="absolute top-0 left-0 right-0 h-0.5 gradient-primary" />
 
-            <Badge variant="primary" className="mb-4">
-              {PRICING.badge}
-            </Badge>
-
-            <h3 className="text-2xl font-bold text-white">{PRICING.title}</h3>
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-2xl font-bold text-white">{PRICING.title}</h3>
+              <Badge variant="primary">{PRICING.badge}</Badge>
+            </div>
             <p className="mt-2 text-sm text-surface-50">
               {PRICING.description}
             </p>
