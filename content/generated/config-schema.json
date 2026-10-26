@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "generatedBy": "TorrentDrive.Core.Configuration.ConfigSchema",
-  "productVersion": "2.4.2",
+  "productVersion": "2.5.0",
   "entries": [
     {
       "envName": "JWT_SECRET",
