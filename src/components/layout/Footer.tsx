@@ -4,6 +4,9 @@ import { ExternalLink, Heart } from "lucide-react";
 
 const FOOTER_LINKS = [
   { label: "Docs", href: "/docs" },
+  { label: "Pricing", href: "/pricing.md" },
+  { label: "llms.txt", href: "/llms.txt" },
+  { label: "RSS", href: "/feed.xml" },
   { label: "GitHub", href: "https://github.com/TorrentDrive", external: true },
   { label: "License", href: "https://github.com/TorrentDrive/backend/blob/main/LICENSE", external: true },
 ];
@@ -19,7 +22,7 @@ export function Footer() {
           </span>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-6">
           {FOOTER_LINKS.map((link) => (
             <Link
               key={link.href}

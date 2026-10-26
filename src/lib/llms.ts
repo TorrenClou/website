@@ -149,6 +149,7 @@ export function buildLlmsTxt(): string {
     "## Key Facts & Architecture",
     "",
     "- **Category**: Self-Hosted Cloud Torrent Downloader / ISP-Blind Seedbox to Google Drive & S3",
+    "- **Pricing**: 100% Free & Open-Source (MIT License) with unlimited torrents and zero subscriptions",
     "- **Stack**: .NET 9 (ASP.NET Core API, Hangfire Orchestrator, MonoTorrent Engine, Google Drive & S3 Workers), Next.js App Router UI, PostgreSQL 15, Redis 7, Prometheus & Grafana",
     "- **Default Web Port**: `47100` (same-origin API proxy; internal admin ports `47200`, `47500`, `47600` bind to `127.0.0.1`)",
     "- **Container Image**: `ghcr.io/torrentdrive/torrentdrive:latest`",
@@ -184,7 +185,9 @@ export function buildLlmsTxt(): string {
     "",
     "## Optional",
     "",
+    `- [Pricing & Specifications](${absoluteUrl("/pricing.md")}): machine-readable tier limits, license, and storage provider compatibility`,
     `- [Full documentation as one file](${absoluteUrl("/llms-full.txt")}): every page above, concatenated`,
+    `- [RSS Feed](${absoluteUrl("/feed.xml")}): syndication feed for newly added documentation`,
     `- [Source on GitHub](${siteConfig.github}): backend, frontend and website repositories`,
     "",
   );

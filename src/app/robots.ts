@@ -3,13 +3,21 @@ import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/site";
 
 /**
- * Everything here is public documentation for a self-hosted product, and being
- * quoted by an assistant is the point rather than a leak. The AI crawlers are
- * named explicitly rather than left to the wildcard so the decision is visible:
- * if any of them should ever be disallowed, this is the file to edit, and the
- * absence of a rule will not be mistaken for an oversight.
+ * Everything here is public documentation and product pages for a self-hosted
+ * product. Being quoted by AI assistants and indexed by all search engines
+ * is the primary goal.
  */
-const AI_CRAWLERS = [
+const SEARCH_AND_AI_BOTS = [
+  // Primary Search Engines
+  "Googlebot",
+  "Bingbot",
+  "Slurp",
+  "DuckDuckBot",
+  "Baiduspider",
+  "YandexBot",
+  "Applebot",
+
+  // AI Search & Extraction Crawlers
   "GPTBot",
   "OAI-SearchBot",
   "ChatGPT-User",
@@ -26,6 +34,7 @@ const AI_CRAWLERS = [
   "DuckAssistBot",
   "cohere-ai",
   "meta-externalagent",
+  "meta-externalfetcher",
   "Bytespider",
   "CCBot",
 ];
@@ -33,8 +42,14 @@ const AI_CRAWLERS = [
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      { userAgent: "*", allow: "/" },
-      ...AI_CRAWLERS.map((userAgent) => ({ userAgent, allow: "/" })),
+      {
+        userAgent: "*",
+        allow: "/",
+      },
+      ...SEARCH_AND_AI_BOTS.map((userAgent) => ({
+        userAgent,
+        allow: "/",
+      })),
     ],
     sitemap: absoluteUrl("/sitemap.xml"),
     host: absoluteUrl(),

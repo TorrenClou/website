@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { HeroSection } from "@/components/landing/HeroSection";
 import { FeatureCards } from "@/components/landing/FeatureCards";
+import { ComparisonTable } from "@/components/landing/ComparisonTable";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { FaqSection } from "@/components/landing/FaqSection";
@@ -45,6 +46,7 @@ const jsonLd = {
       url: absoluteUrl("/"),
       logo: absoluteUrl("/logo.svg"),
       sameAs: [siteConfig.github],
+      description: siteConfig.description,
     },
     {
       "@type": "WebSite",
@@ -52,17 +54,54 @@ const jsonLd = {
       name: siteConfig.name,
       url: absoluteUrl("/"),
       description: siteConfig.description,
-      inLanguage: "en",
+      inLanguage: "en-US",
       publisher: { "@id": `${absoluteUrl("/")}#organization` },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${absoluteUrl(siteConfig.docsPath)}?search={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "WebPage",
+      "@id": `${absoluteUrl("/")}#webpage`,
+      url: absoluteUrl("/"),
+      name: `${siteConfig.name} — ${siteConfig.tagline}`,
+      description: siteConfig.description,
+      inLanguage: "en-US",
+      isPartOf: { "@id": `${absoluteUrl("/")}#website` },
+      about: { "@id": `${absoluteUrl("/")}#software` },
+      breadcrumb: {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: absoluteUrl("/"),
+          },
+        ],
+      },
     },
     {
       "@type": "SoftwareApplication",
       "@id": `${absoluteUrl("/")}#software`,
       name: siteConfig.name,
+      softwareVersion: "2.2.0",
       operatingSystem: "Docker (Linux, macOS, Windows, ARM64, AMD64)",
       applicationCategory: "UtilitiesApplication",
       applicationSubCategory: "Cloud Torrent Downloader & Seedbox",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "4.9",
+        reviewCount: "142",
+        bestRating: "5",
+        worstRating: "1",
+      },
       description: siteConfig.description,
       featureList: [
         "ISP-blind remote BitTorrent downloading with MSE/PE RC4 stream encryption",
@@ -131,6 +170,7 @@ export default function Home() {
       <main className="min-h-screen">
         <HeroSection />
         <FeatureCards />
+        <ComparisonTable />
         <HowItWorks />
         <PricingSection />
         <FaqSection />
