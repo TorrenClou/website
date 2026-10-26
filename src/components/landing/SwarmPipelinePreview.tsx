@@ -14,6 +14,7 @@ import {
   RotateCcw,
   ShieldCheck,
 } from "lucide-react";
+import { PillTabs } from "@/components/ui/PillTabs";
 import { cn } from "@/lib/utils";
 
 interface TorrentPreset {
@@ -67,6 +68,11 @@ const PRESETS: TorrentPreset[] = [
     hashPrefix: "c7025fa4",
   },
 ];
+
+const PRESET_TABS = PRESETS.map((item) => ({
+  id: item.id,
+  label: item.name.split("-")[0],
+}));
 
 const TOTAL_PIECES = 36;
 
@@ -161,38 +167,15 @@ export function SwarmPipelinePreview() {
       <div className="rounded-xl border border-surface-300/35 bg-surface-tonal-500 overflow-hidden">
         {/* Top Window Bar: Preset Selector + Simulation Controls */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-surface-300/25 bg-surface-500/80 px-4 py-3">
-          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Sample torrent presets">
-            {PRESETS.map((item) => {
-              const active = item.id === preset.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => handleSelectPreset(item.id)}
-                  className={cn(
-                    "relative rounded-md px-2.5 py-1 text-xs font-mono cursor-pointer select-none transition-colors duration-150 active:scale-[0.97]",
-                    active
-                      ? "text-primary-300"
-                      : "text-surface-100 hover:text-white"
-                  )}
-                >
-                  {active && (
-                    <motion.span
-                      layoutId="swarm-preset-pill"
-                      transition={{
-                        type: "spring",
-                        duration: 0.28,
-                        bounce: 0,
-                      }}
-                      className="absolute inset-0 rounded-md border border-primary-500/40 bg-primary-500/15"
-                    />
-                  )}
-                  <span className="relative z-10">{item.name.split("-")[0]}</span>
-                </button>
-              );
-            })}
-          </div>
+          <PillTabs
+            items={PRESET_TABS}
+            value={preset.id}
+            onChange={handleSelectPreset}
+            layoutId="swarm-preset-pill"
+            ariaLabel="Sample torrent presets"
+            className="border-0 bg-transparent p-0 gap-1.5"
+            buttonClassName="px-2.5 py-1 font-mono"
+          />
 
           <div className="flex items-center gap-2">
             <button

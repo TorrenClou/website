@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, X } from "lucide-react";
+import { PillTabs } from "@/components/ui/PillTabs";
 import { cn } from "@/lib/utils";
 
 interface ComparisonRow {
@@ -166,42 +167,14 @@ export function ComparisonTable() {
           </p>
 
           {/* Interactive Category Filter Tabs */}
-          <div
-            className="mt-6 inline-flex flex-wrap items-center justify-center gap-1 rounded-lg border border-surface-300/30 bg-surface-tonal-500 p-1"
-            role="group"
-            aria-label="Filter comparison categories"
-          >
-            {FILTER_TABS.map((tab) => {
-              const active = filter === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => setFilter(tab.id)}
-                  className={cn(
-                    "relative cursor-pointer rounded-md px-3 py-1.5 text-xs font-medium select-none transition-colors duration-150 active:scale-[0.97]",
-                    active
-                      ? "text-primary-300"
-                      : "text-surface-100 hover:text-white"
-                  )}
-                >
-                  {active && (
-                    <motion.span
-                      layoutId="comparison-filter-pill"
-                      transition={{
-                        type: "spring",
-                        duration: 0.25,
-                        bounce: 0,
-                      }}
-                      className="absolute inset-0 rounded-md border border-primary-500/35 bg-primary-500/15"
-                    />
-                  )}
-                  <span className="relative z-10">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          <PillTabs
+            items={FILTER_TABS}
+            value={filter}
+            onChange={setFilter}
+            layoutId="comparison-filter-pill"
+            ariaLabel="Filter comparison categories"
+            className="mt-6"
+          />
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-surface-300/30 bg-surface-tonal-500">

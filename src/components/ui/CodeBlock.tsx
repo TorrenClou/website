@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { useState, useCallback } from "react";
+import { useCopyToClipboard } from "@/lib/use-copy-to-clipboard";
 import { Copy, Check, Terminal } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
@@ -13,15 +13,12 @@ interface CodeBlockProps {
 }
 
 export function CodeBlock({ code, filename, className }: CodeBlockProps) {
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopyToClipboard(1800);
   const shouldReduceMotion = useReducedMotion();
 
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    });
-  }, [code]);
+  const handleCopy = () => {
+    void copy(code);
+  };
 
   return (
     <div

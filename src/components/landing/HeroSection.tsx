@@ -5,9 +5,9 @@ import { motion, useReducedMotion } from "framer-motion";
 import { fadeUpVariant, staggerContainer } from "@/lib/animation-variants";
 import { Button } from "@/components/ui/Button";
 import { CodeBlock } from "@/components/ui/CodeBlock";
+import { PillTabs } from "@/components/ui/PillTabs";
 import { SwarmPipelinePreview } from "@/components/landing/SwarmPipelinePreview";
 import { ExternalLink, Shield, Server, Layers } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 type Platform = "linux" | "compose" | "windows";
 
@@ -118,42 +118,15 @@ export function HeroSection() {
           className="mx-auto mt-12 max-w-3xl"
         >
           {/* Shared-layout sliding platform tab bar */}
-          <div
-            className="mb-3 inline-flex flex-wrap items-center justify-center rounded-lg border border-surface-300/30 bg-surface-tonal-500 p-1"
-            role="group"
-            aria-label="Installation platform"
-          >
-            {PLATFORM_TABS.map((tab) => {
-              const active = platform === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  aria-pressed={active}
-                  onClick={() => setPlatform(tab.id)}
-                  className={cn(
-                    "relative cursor-pointer rounded-md px-3.5 py-1.5 text-xs font-medium select-none transition-colors duration-150 active:scale-[0.97]",
-                    active
-                      ? "text-primary-300"
-                      : "text-surface-100 hover:text-white"
-                  )}
-                >
-                  {active && (
-                    <motion.span
-                      layoutId="hero-install-tab-pill"
-                      transition={{
-                        type: "spring",
-                        duration: 0.28,
-                        bounce: 0,
-                      }}
-                      className="absolute inset-0 rounded-md border border-primary-500/35 bg-primary-500/15"
-                    />
-                  )}
-                  <span className="relative z-10">{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          <PillTabs
+            items={PLATFORM_TABS}
+            value={platform}
+            onChange={setPlatform}
+            layoutId="hero-install-tab-pill"
+            ariaLabel="Installation platform"
+            className="mb-3"
+            buttonClassName="px-3.5"
+          />
 
           <CodeBlock code={cmd.code} filename={cmd.filename} />
 
