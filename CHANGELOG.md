@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.2.0](https://github.com/TorrentDrive/website/releases/tag/v2.2.0) (2026-10-26)
+
+* feat(ci): fold deploy repo into backend and unify all-in-one release pipeline (e54a50c)
+* docs(schema): sync configuration schema for backend v2.1.1 [skip ci] (2c9a654)
+
+
 ## [2.1.0](https://github.com/TorrentDrive/website/releases/tag/v2.1.0) (2026-10-25)
 
 * ci: simplify CI/CD pipeline with direct automatic SemVer releases on main (795dac5)
