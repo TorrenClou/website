@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.1](https://github.com/TorrentDrive/website/releases/tag/v2.4.1) (2026-10-26)
+
+* fix(ui): use semantic tokens and add ARIA pressed/focus states (7638951)
+* docs(schema): sync configuration schema for backend v2.4.0 [skip ci] (6604cd8)
+* docs(schema): sync configuration schema for backend v2.3.0 [skip ci] (e95f1eb)
+
+
 ## [2.4.0](https://github.com/TorrentDrive/website/releases/tag/v2.4.0) (2026-10-26)
 
 * feat(ui): add interactive swarm pipeline preview and purposeful motion polish (d10c8c1)
