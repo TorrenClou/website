@@ -82,15 +82,15 @@ export function HeroSection() {
           className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-mono text-surface-100"
         >
           <span className="inline-flex items-center gap-1.5">
-            <Shield size={13} className="text-primary-400" />
+            <Shield size={13} aria-hidden="true" className="text-primary-400" />
             MSE/PE RC4 + BEP 27 Isolation
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Server size={13} className="text-primary-400" />
+            <Server size={13} aria-hidden="true" className="text-primary-400" />
             Single All-in-One Container
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <Layers size={13} className="text-primary-400" />
+            <Layers size={13} aria-hidden="true" className="text-primary-400" />
             Dokploy &amp; Coolify Ready
           </span>
         </motion.div>
@@ -109,7 +109,7 @@ export function HeroSection() {
             size="lg"
           >
             View on GitHub
-            <ExternalLink size={16} />
+            <ExternalLink size={16} aria-hidden="true" />
           </Button>
         </motion.div>
 
@@ -118,13 +118,18 @@ export function HeroSection() {
           className="mx-auto mt-12 max-w-3xl"
         >
           {/* Shared-layout sliding platform tab bar */}
-          <div className="mb-3 inline-flex flex-wrap items-center justify-center rounded-lg border border-surface-300/30 bg-surface-tonal-500 p-1">
+          <div
+            className="mb-3 inline-flex flex-wrap items-center justify-center rounded-lg border border-surface-300/30 bg-surface-tonal-500 p-1"
+            role="group"
+            aria-label="Installation platform"
+          >
             {PLATFORM_TABS.map((tab) => {
               const active = platform === tab.id;
               return (
                 <button
                   key={tab.id}
                   type="button"
+                  aria-pressed={active}
                   onClick={() => setPlatform(tab.id)}
                   className={cn(
                     "relative cursor-pointer rounded-md px-3.5 py-1.5 text-xs font-medium select-none transition-colors duration-150 active:scale-[0.97]",

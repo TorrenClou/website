@@ -33,7 +33,7 @@ export function CodeBlock({ code, filename, className }: CodeBlockProps) {
       {filename && (
         <div className="flex items-center justify-between border-b border-surface-300/20 bg-surface-tonal-500/70 px-4 py-2">
           <span className="inline-flex items-center gap-2 text-xs text-surface-100 font-mono">
-            <Terminal size={13} className="text-primary-400" />
+            <Terminal size={13} aria-hidden="true" className="text-primary-400" />
             {filename}
           </span>
           <button
@@ -43,7 +43,7 @@ export function CodeBlock({ code, filename, className }: CodeBlockProps) {
               "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-mono cursor-pointer select-none",
               "transition-[background-color,border-color,color,transform] duration-150 ease-[cubic-bezier(0.165,0.84,0.44,1)] active:scale-[0.97]",
               copied
-                ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
+                ? "border-success/40 bg-success/15 text-success-light"
                 : "border-surface-300/35 bg-surface-400/50 text-surface-100 hover:border-surface-200/50 hover:bg-surface-300/40 hover:text-white"
             )}
             aria-label={copied ? "Copied to clipboard" : "Copy command"}
@@ -65,9 +65,9 @@ export function CodeBlock({ code, filename, className }: CodeBlockProps) {
                         : { opacity: 0, scale: 0.6, filter: "blur(2px)" }
                     }
                     transition={{ duration: 0.14, ease: [0.165, 0.84, 0.44, 1] }}
-                    className="inline-flex items-center justify-center text-emerald-400"
+                    className="inline-flex items-center justify-center text-success-medium"
                   >
-                    <Check size={13} strokeWidth={2.5} />
+                    <Check size={13} strokeWidth={2.5} aria-hidden="true" />
                   </motion.span>
                 ) : (
                   <motion.span
@@ -86,7 +86,7 @@ export function CodeBlock({ code, filename, className }: CodeBlockProps) {
                     transition={{ duration: 0.14, ease: [0.165, 0.84, 0.44, 1] }}
                     className="inline-flex items-center justify-center"
                   >
-                    <Copy size={13} />
+                    <Copy size={13} aria-hidden="true" />
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -106,7 +106,7 @@ export function CodeBlock({ code, filename, className }: CodeBlockProps) {
             className="absolute top-3 right-3 rounded-md border border-surface-300/35 bg-surface-400/60 p-1.5 text-surface-100 transition-colors hover:bg-surface-300/50 hover:text-white active:scale-[0.97] cursor-pointer"
             aria-label="Copy code"
           >
-            {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+            {copied ? <Check size={14} aria-hidden="true" className="text-success-medium" /> : <Copy size={14} aria-hidden="true" />}
           </button>
         )}
       </div>

@@ -76,6 +76,7 @@ export function HowItWorks() {
               >
                 <button
                   type="button"
+                  aria-pressed={isActive}
                   onMouseEnter={() => setActiveStep(step.step)}
                   onFocus={() => setActiveStep(step.step)}
                   onClick={() => setActiveStep(step.step)}
@@ -107,7 +108,7 @@ export function HowItWorks() {
                           : "border-surface-300/35 bg-surface-400/40 text-surface-100"
                       )}
                     >
-                      <Icon size={20} />
+                      <Icon size={20} aria-hidden="true" />
                     </div>
                     <span
                       className={cn(
@@ -131,7 +132,7 @@ export function HowItWorks() {
                   <div className="mt-auto pt-5">
                     <div className="rounded-lg border border-surface-300/25 bg-surface-500/80 p-3 font-mono text-xs">
                       <div className="flex items-center gap-1.5 text-primary-400">
-                        <Terminal size={12} />
+                        <Terminal size={12} aria-hidden="true" />
                         <span className="truncate">{step.artifactLabel}</span>
                       </div>
                       <div className="mt-1 text-surface-100 leading-snug">

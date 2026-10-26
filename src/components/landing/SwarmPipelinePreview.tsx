@@ -146,7 +146,7 @@ export function SwarmPipelinePreview() {
 
   const inspectedState = getPieceState(inspectedPiece, cursor);
   const inspectedPeer = PEER_ENDPOINTS[inspectedPiece % PEER_ENDPOINTS.length];
-  const inspectedHash = `${preset.hashPrefix}${(inspectedPiece * 2654435761 >>> 0)
+  const inspectedHash = `${preset.hashPrefix}${((inspectedPiece * 2654435761) >>> 0)
     .toString(16)
     .padStart(8, "0")
     .slice(0, 8)}`;
@@ -161,13 +161,14 @@ export function SwarmPipelinePreview() {
       <div className="rounded-xl border border-surface-300/35 bg-surface-tonal-500 overflow-hidden">
         {/* Top Window Bar: Preset Selector + Simulation Controls */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-surface-300/25 bg-surface-500/80 px-4 py-3">
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Sample torrent presets">
             {PRESETS.map((item) => {
               const active = item.id === preset.id;
               return (
                 <button
                   key={item.id}
                   type="button"
+                  aria-pressed={active}
                   onClick={() => handleSelectPreset(item.id)}
                   className={cn(
                     "relative rounded-md px-2.5 py-1 text-xs font-mono cursor-pointer select-none transition-colors duration-150 active:scale-[0.97]",
@@ -196,17 +197,19 @@ export function SwarmPipelinePreview() {
           <div className="flex items-center gap-2">
             <button
               type="button"
+              aria-pressed={failoverSimulated}
               onClick={() => setFailoverSimulated((prev) => !prev)}
               className={cn(
                 "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium cursor-pointer select-none",
                 "transition-[background-color,border-color,color,transform] duration-150 ease-[cubic-bezier(0.165,0.84,0.44,1)] active:scale-[0.97]",
                 failoverSimulated
-                  ? "border-amber-500/45 bg-amber-500/15 text-amber-300"
+                  ? "border-warning/45 bg-warning/15 text-warning-light"
                   : "border-surface-300/35 bg-surface-400/50 text-surface-100 hover:border-surface-200/50 hover:text-white"
               )}
             >
               <RefreshCw
                 size={12}
+                aria-hidden="true"
                 className={cn(
                   "transition-transform duration-300",
                   failoverSimulated && "rotate-180"
@@ -221,11 +224,12 @@ export function SwarmPipelinePreview() {
 
             <button
               type="button"
+              aria-pressed={isPlaying}
               onClick={() => setIsPlaying((prev) => !prev)}
               className="inline-flex items-center gap-1 rounded-md border border-surface-300/35 bg-surface-400/50 px-2.5 py-1 text-xs text-surface-100 hover:border-surface-200/50 hover:text-white active:scale-[0.97] cursor-pointer select-none"
               aria-label={isPlaying ? "Pause telemetry simulation" : "Resume telemetry simulation"}
             >
-              {isPlaying ? <Pause size={12} /> : <Play size={12} />}
+              {isPlaying ? <Pause size={12} aria-hidden="true" /> : <Play size={12} aria-hidden="true" />}
               <span>{isPlaying ? "Live" : "Paused"}</span>
             </button>
 
@@ -236,7 +240,7 @@ export function SwarmPipelinePreview() {
               aria-label="Restart piece stream"
               title="Restart piece stream"
             >
-              <RotateCcw size={12} />
+              <RotateCcw size={12} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -256,7 +260,7 @@ export function SwarmPipelinePreview() {
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-surface-100">
                 <span className="inline-flex items-center gap-1 text-primary-400">
-                  <Lock size={12} />
+                  <Lock size={12} aria-hidden="true" />
                   MSE/PE RC4 Stream
                 </span>
                 <span>·</span>
@@ -277,7 +281,7 @@ export function SwarmPipelinePreview() {
               </div>
               <div>
                 <div className="text-surface-100">Cloud Stream</div>
-                <div className="font-semibold text-emerald-400">
+                <div className="font-semibold text-success-medium">
                   {activeUpMbps.toFixed(1)} MB/s
                 </div>
               </div>
@@ -294,7 +298,7 @@ export function SwarmPipelinePreview() {
             <div className="rounded-lg border border-surface-300/25 bg-surface-500/50 p-3">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-medium text-white inline-flex items-center gap-1.5">
-                  <ShieldCheck size={14} className="text-primary-400" />
+                  <ShieldCheck size={14} aria-hidden="true" className="text-primary-400" />
                   1. Remote Swarm Socket
                 </span>
                 <span className="font-mono text-primary-400 tabular-nums">
@@ -310,7 +314,7 @@ export function SwarmPipelinePreview() {
             <div className="rounded-lg border border-surface-300/25 bg-surface-500/50 p-3">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-medium text-white inline-flex items-center gap-1.5">
-                  <HardDrive size={14} className="text-primary-400" />
+                  <HardDrive size={14} aria-hidden="true" className="text-primary-400" />
                   2. SHA-1 Piece Buffer
                 </span>
                 <span className="font-mono text-surface-50 tabular-nums">
@@ -327,7 +331,7 @@ export function SwarmPipelinePreview() {
               className={cn(
                 "rounded-lg border p-3 transition-colors duration-200",
                 failoverSimulated
-                  ? "border-amber-500/35 bg-amber-500/10"
+                  ? "border-warning/35 bg-warning/10"
                   : "border-surface-300/25 bg-surface-500/50"
               )}
             >
@@ -335,8 +339,9 @@ export function SwarmPipelinePreview() {
                 <span className="font-medium text-white inline-flex items-center gap-1.5">
                   <Cloud
                     size={14}
+                    aria-hidden="true"
                     className={
-                      failoverSimulated ? "text-amber-400" : "text-emerald-400"
+                      failoverSimulated ? "text-warning-medium" : "text-success-medium"
                     }
                   />
                   3. Cloud Sink Router
@@ -357,7 +362,7 @@ export function SwarmPipelinePreview() {
                           : { opacity: 0, y: 4 }
                       }
                       transition={{ duration: 0.15 }}
-                      className="font-mono text-amber-300"
+                      className="font-mono text-warning-light"
                     >
                       Cloudflare R2 (Failover)
                     </motion.span>
@@ -376,7 +381,7 @@ export function SwarmPipelinePreview() {
                           : { opacity: 0, y: 4 }
                       }
                       transition={{ duration: 0.15 }}
-                      className="font-mono text-emerald-400"
+                      className="font-mono text-success-medium"
                     >
                       Google Drive OAuth2
                     </motion.span>
@@ -404,7 +409,7 @@ export function SwarmPipelinePreview() {
               </div>
               <div className="flex flex-wrap items-center gap-3 text-xs text-surface-100">
                 <span className="inline-flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-xs bg-emerald-500/85" />
+                  <span className="h-2.5 w-2.5 rounded-xs bg-success/85" />
                   Streamed &amp; Purged
                 </span>
                 <span className="inline-flex items-center gap-1.5">
@@ -432,12 +437,14 @@ export function SwarmPipelinePreview() {
                   <button
                     key={index}
                     type="button"
+                    aria-pressed={isInspected}
                     onMouseEnter={() => setInspectedPiece(index)}
+                    onFocus={() => setInspectedPiece(index)}
                     onClick={() => setInspectedPiece(index)}
                     className={cn(
                       "h-6 rounded-sm border transition-[background-color,border-color,transform] duration-150 ease-[cubic-bezier(0.165,0.84,0.44,1)] cursor-pointer",
                       state === "streamed" &&
-                        "border-emerald-500/50 bg-emerald-500/75 hover:bg-emerald-400",
+                        "border-success/50 bg-success/75 hover:bg-success-medium",
                       state === "verified" &&
                         "border-primary-400/60 bg-primary-500/80 hover:bg-primary-400",
                       state === "encrypting" &&
@@ -472,7 +479,7 @@ export function SwarmPipelinePreview() {
                   className={cn(
                     "inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium",
                     inspectedState === "streamed" &&
-                      "bg-emerald-500/15 text-emerald-300",
+                      "bg-success/15 text-success-light",
                     inspectedState === "verified" &&
                       "bg-primary-500/20 text-primary-300",
                     inspectedState === "encrypting" &&
@@ -483,20 +490,20 @@ export function SwarmPipelinePreview() {
                 >
                   {inspectedState === "streamed" && (
                     <>
-                      <CheckCircle2 size={12} />
+                      <CheckCircle2 size={12} aria-hidden="true" />
                       Streamed to{" "}
                       {failoverSimulated ? "Cloudflare R2" : "Google Drive"} · Local Purged
                     </>
                   )}
                   {inspectedState === "verified" && (
                     <>
-                      <ArrowRight size={12} />
+                      <ArrowRight size={12} aria-hidden="true" />
                       SHA-1 Match · Uploading Multipart Chunk
                     </>
                   )}
                   {inspectedState === "encrypting" && (
                     <>
-                      <Lock size={12} />
+                      <Lock size={12} aria-hidden="true" />
                       Decrypting MSE/RC4 Peer Stream
                     </>
                   )}

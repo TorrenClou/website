@@ -119,17 +119,17 @@ function RenderValue({
   if (typeof value === "boolean") {
     return value ? (
       <span
-        className="inline-flex items-center justify-center rounded-full bg-emerald-500/15 p-1 text-emerald-400"
+        className="inline-flex items-center justify-center rounded-full bg-success/15 p-1 text-success-medium"
         aria-label="Supported"
       >
-        <Check size={15} strokeWidth={2.5} />
+        <Check size={15} strokeWidth={2.5} aria-hidden="true" />
       </span>
     ) : (
       <span
-        className="inline-flex items-center justify-center rounded-full bg-red-500/10 p-1 text-red-400"
+        className="inline-flex items-center justify-center rounded-full bg-danger/15 p-1 text-danger-light"
         aria-label="Not supported"
       >
-        <X size={15} strokeWidth={2.5} />
+        <X size={15} strokeWidth={2.5} aria-hidden="true" />
       </span>
     );
   }
@@ -166,13 +166,18 @@ export function ComparisonTable() {
           </p>
 
           {/* Interactive Category Filter Tabs */}
-          <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-1 rounded-lg border border-surface-300/30 bg-surface-tonal-500 p-1">
+          <div
+            className="mt-6 inline-flex flex-wrap items-center justify-center gap-1 rounded-lg border border-surface-300/30 bg-surface-tonal-500 p-1"
+            role="group"
+            aria-label="Filter comparison categories"
+          >
             {FILTER_TABS.map((tab) => {
               const active = filter === tab.id;
               return (
                 <button
                   key={tab.id}
                   type="button"
+                  aria-pressed={active}
                   onClick={() => setFilter(tab.id)}
                   className={cn(
                     "relative cursor-pointer rounded-md px-3 py-1.5 text-xs font-medium select-none transition-colors duration-150 active:scale-[0.97]",
