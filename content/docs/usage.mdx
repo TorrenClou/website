@@ -1,6 +1,6 @@
 ---
 title: Usage Guide
-description: Upload and analyze .torrent batches, pick individual files, manage jobs, and control cloud storage failover.
+description: Upload and analyze .torrent batches, pick individual files, filter and search jobs, and control cloud storage failover.
 ---
 
 ## Adding & Analyzing Torrents
@@ -30,9 +30,31 @@ individual files before any transfer begins:
 Open **Dashboard** (`/dashboard`) or **Jobs** (`/jobs`) to watch transfers in real time:
 
 - **Status Progression**: `QUEUED` → `DOWNLOADING` → `PENDING_UPLOAD` → `UPLOADING` → `COMPLETED`
-- **Live Telemetry**: Real-time progress percentage, downloaded bytes, upload progress, and a
-  step-by-step **Job Timeline** recording every state transition and worker source (`Worker`,
-  `User`, `System`, `Recovery`).
+- **Dual-Phase Telemetry**: Every job card displays side-by-side progress for the **Download Phase**
+  (BitTorrent pieces fetched, live `↓ MB/s`, and ETA) and the **Upload Phase** (cloud bytes transferred,
+  live `↑ MB/s`, ETA, and target Storage Profile), plus an `InfoHash` copy chip, file selection summary,
+  and a step-by-step **Job Timeline** on `/jobs/<id>`.
+- **Inline Quick Actions**: Trigger **Force Start**, **Retry**, or **Cancel** directly from any job card
+  on `/dashboard` or `/jobs`, or use **Retry All Failed** and multi-select batch actions to recover or
+  cancel multiple transfers at once.
+
+## Searching, Filtering & Sorting Jobs
+
+The **Jobs Command Console** (`/jobs`) provides server-side search, multi-facet filtering, and sorting
+across your entire transfer history with shareable URL query parameters:
+
+- **Token-Aware Search (`/` shortcut)**: Search across torrent filenames, inner file paths, `InfoHash`,
+  Storage Profile names, error messages, or job IDs (`#42`). Combine free text with structured query tokens:
+  - `provider:gdrive` or `provider:s3` — filter by Storage Provider
+  - `phase:active`, `phase:downloading`, `phase:uploading`, `phase:retrying`, `phase:failed` — filter by lifecycle phase
+  - `is:pinned`, `is:rerouted`, `is:stalled`, `is:selective`, `has:error` — filter by routing or health traits
+  - `type:video`, `type:audio`, `type:archive`, `type:document`, `type:software` — filter by media category
+  - `size:<1gb`, `size:1-10gb`, `size:10-50gb`, `size:>50gb` — filter by transfer size bucket
+- **Facet Dropdowns & Smart Views**: Filter by specific Storage Profile, media category, size bucket, or
+  creation date range (`Today`, `Last 7 Days`, `Last 30 Days`, `Last 90 Days`), or apply one-click
+  **Smart Views** (such as *Needs Attention*, *Active Cloud Uploads*, *Rerouted Transfers*, or *Large Media*).
+- **Multi-Field Sorting**: Sort transfers ascending or descending by **Created Date**, **Total Size**,
+  **Transfer Progress**, **Live Speed**, **File Name**, or **Completed Date**.
 
 ## Managing Destinations, Pinning & Failover
 
