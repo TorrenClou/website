@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.4.0](https://github.com/TorrentDrive/website/releases/tag/v2.4.0) (2026-10-26)
+
+* feat(ui): add interactive swarm pipeline preview and purposeful motion polish (d10c8c1)
+* docs(schema): sync configuration schema for backend v2.2.0 [skip ci] (11fd409)
+
+
 ## [2.3.0](https://github.com/TorrentDrive/website/releases/tag/v2.3.0) (2026-10-26)
 
 * feat(seo): implement nextjs-seo, ai-seo, and instant indexing architecture (e9daa44)
