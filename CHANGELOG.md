@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.3.0](https://github.com/TorrentDrive/website/releases/tag/v2.3.0) (2026-10-26)
+
+* feat(seo): implement nextjs-seo, ai-seo, and instant indexing architecture (e9daa44)
+
+
 ## [2.2.0](https://github.com/TorrentDrive/website/releases/tag/v2.2.0) (2026-10-26)
 
 * feat(ci): fold deploy repo into backend and unify all-in-one release pipeline (e54a50c)
