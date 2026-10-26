@@ -5,7 +5,7 @@ import { ExternalLink, Heart } from "lucide-react";
 const FOOTER_LINKS = [
   { label: "Docs", href: "/docs" },
   { label: "GitHub", href: "https://github.com/TorrentDrive", external: true },
-  { label: "License", href: "https://github.com/TorrentDrive/deploy/blob/main/LICENSE", external: true },
+  { label: "License", href: "https://github.com/TorrentDrive/backend/blob/main/LICENSE", external: true },
 ];
 
 export function Footer() {

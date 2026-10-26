@@ -55,7 +55,7 @@ complete configuration — the container generates what it needs on first boot.
 
 This table is generated from the backend's own option declarations and attached to each release,
 so it describes what the code implements rather than what someone remembered to write down. It
-used to be maintained by hand here, in two READMEs, in `deploy/docs` and in `.env.example`, and no
+used to be maintained by hand here, in multiple READMEs, and in `.env.example`, and no
 two copies agreed.
 
 <ConfigSchemaVersion />
@@ -100,5 +100,5 @@ You do not need one. If you would rather keep overrides in a file:
 docker run -d --env-file .env ... ghcr.io/torrentdrive/torrentdrive:latest
 ```
 
-[`.env.example`](https://github.com/TorrentDrive/deploy/blob/main/.env.example) lists the available
+[`.env.example`](https://github.com/TorrentDrive/backend/blob/main/.env.example) lists the available
 overrides, all commented out.

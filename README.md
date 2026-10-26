@@ -9,9 +9,8 @@ Live at **[tc.gitnasr.com](https://tc.gitnasr.com)**.
 
 Every fact about installing, configuring or operating TorrentDrive belongs in
 `content/docs/`. The READMEs in
-[backend](https://github.com/TorrentDrive/backend),
-[frontend](https://github.com/TorrentDrive/frontend) and
-[deploy](https://github.com/TorrentDrive/deploy) link here rather than restating
+[backend](https://github.com/TorrentDrive/backend) and
+[frontend](https://github.com/TorrentDrive/frontend) link here rather than restating
 anything, because for a long time they each kept their own copy and the copies
 disagreed with each other and with the code.
 
@@ -55,9 +54,9 @@ the OG image all follow from those two steps.
 
 | Repository | Contents |
 |------------|----------|
-| [backend](https://github.com/TorrentDrive/backend) | .NET 9 API and workers |
+| [backend](https://github.com/TorrentDrive/backend) | .NET 9 API, workers, unified all-in-one container, compose manifests, PaaS blueprints, and installers |
 | [frontend](https://github.com/TorrentDrive/frontend) | Next.js web app |
-| [deploy](https://github.com/TorrentDrive/deploy) | All-in-one image, installer, CI |
+| [website](https://github.com/TorrentDrive/website) | Documentation site — the canonical docs live here |
 
 ## License
 

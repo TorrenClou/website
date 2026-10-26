@@ -59,7 +59,7 @@ export default async function Page({ params }: DocsPageProps) {
         },
         author: { "@type": "Organization", name: siteConfig.name, url: siteConfig.github },
         publisher: { "@type": "Organization", name: siteConfig.name, url: siteConfig.github },
-        license: `${siteConfig.github}/deploy/blob/main/LICENSE`,
+        license: `${siteConfig.github}/backend/blob/main/LICENSE`,
         ...(modified ? { dateModified: modified } : {}),
       },
       {

@@ -10,7 +10,7 @@ and a native Dokploy template blueprint (`paas/dokploy/template.toml`).
 ## Option A: Deploy as a Compose Service
 
 1. In Dokploy, click **Create Project** → **Compose**.
-2. Set Repository to `https://github.com/TorrentDrive/deploy`, branch `main`, and Compose Path to
+2. Set Repository to `https://github.com/TorrentDrive/backend`, branch `main`, and Compose Path to
    `paas/dokploy/docker-compose.yml`.
 3. Click **Deploy**. First boot takes 1–2 minutes while PostgreSQL initializes and secrets are
    generated into `/data/postgres/secrets.env`.
@@ -20,7 +20,7 @@ and a native Dokploy template blueprint (`paas/dokploy/template.toml`).
 
 ## Option B: Import the Native Dokploy Template (`template.toml`)
 
-[`paas/dokploy/template.toml`](https://github.com/TorrentDrive/deploy/blob/main/paas/dokploy/template.toml)
+[`paas/dokploy/template.toml`](https://github.com/TorrentDrive/backend/blob/main/paas/dokploy/template.toml)
 pre-configures port `47100` routing and auto-generates `PUBLIC_FRONTEND_URL` and `NEXTAUTH_URL` from
 Dokploy's `${domain}` generator so Google Drive OAuth callbacks work out of the box.
 

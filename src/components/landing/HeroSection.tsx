@@ -12,15 +12,15 @@ type Platform = "linux" | "compose" | "windows";
 
 const INSTALL_COMMANDS: Record<Platform, { code: string; filename: string }> = {
   linux: {
-    code: "curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.sh | bash",
+    code: "curl -fsSL https://raw.githubusercontent.com/TorrentDrive/backend/main/install.sh | bash",
     filename: "terminal",
   },
   compose: {
-    code: "curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/docker-compose.yml -o docker-compose.yml && docker compose up -d",
+    code: "curl -fsSL https://raw.githubusercontent.com/TorrentDrive/backend/main/docker-compose.yml -o docker-compose.yml && docker compose up -d",
     filename: "docker-compose",
   },
   windows: {
-    code: "irm https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.ps1 | iex",
+    code: "irm https://raw.githubusercontent.com/TorrentDrive/backend/main/install.ps1 | iex",
     filename: "powershell",
   },
 };

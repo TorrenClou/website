@@ -8,25 +8,25 @@ S3-compatible storage, then cleans up local disk space automatically.
 
 Everything ships as a single container that generates its own secrets on first boot and is
 configured entirely in the browser. If you find yourself editing a config file to do something
-ordinary, that is a bug — please [open an issue](https://github.com/TorrentDrive/deploy/issues).
+ordinary, that is a bug — please [open an issue](https://github.com/TorrentDrive/backend/issues).
 
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/TorrentDrive/backend/main/install.sh | bash
 ```
 
 Or with Docker Compose (zero `.env` required):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/TorrentDrive/deploy/main/docker-compose.yml -o docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/TorrentDrive/backend/main/docker-compose.yml -o docker-compose.yml
 docker compose up -d
 ```
 
 Windows, in PowerShell:
 
 ```powershell
-irm https://raw.githubusercontent.com/TorrentDrive/deploy/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/TorrentDrive/backend/main/install.ps1 | iex
 ```
 
 Docker is the only requirement. Open the URL it prints and complete the 3-step setup wizard.
@@ -82,8 +82,7 @@ Only port **47100** needs to be reachable for normal use. Internal admin ports a
 
 | Repository | Contents |
 |------------|----------|
-| [deploy](https://github.com/TorrentDrive/deploy) | The all-in-one image, compose manifests, PaaS blueprints, and installer |
-| [backend](https://github.com/TorrentDrive/backend) | .NET 9 API, Hangfire orchestrator, and transfer workers |
+| [backend](https://github.com/TorrentDrive/backend) | .NET 9 API, Hangfire orchestrator, transfer workers, unified all-in-one container, compose manifests, PaaS blueprints, and installers |
 | [frontend](https://github.com/TorrentDrive/frontend) | Next.js web application |
 | [website](https://github.com/TorrentDrive/website) | Landing site and documentation |
 
