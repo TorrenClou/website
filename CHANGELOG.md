@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.4.2](https://github.com/TorrentDrive/website/releases/tag/v2.4.2) (2026-10-26)
+
+* refactor(ui): extract shared PillTabs and useCopyToClipboard hook (6683791)
+
+
 ## [2.4.1](https://github.com/TorrentDrive/website/releases/tag/v2.4.1) (2026-10-26)
 
 * fix(ui): use semantic tokens and add ARIA pressed/focus states (7638951)
